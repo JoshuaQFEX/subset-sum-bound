@@ -139,7 +139,6 @@ def main() -> None:
             (outdir / f'{cert_mod}.lean').write_text('\n'.join(cert_lines), encoding='utf-8')
             cert_names.append(key)
 
-        imports.extend(cert_modules)
         imports.append(f'SubsetSum.FilterData.{mod}')
         filter_lines = [
             '/-', f'Author: Joshua Wharton, QFEX, joshua@qfex.com',
