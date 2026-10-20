@@ -1,58 +1,70 @@
 $ lake build
-⚠ [7353/7363] Replayed SubsetSum.CertificateTransfer
+⚠ [7353/7364] Replayed SubsetSum.CertificateTransfer
 warning: SubsetSum/CertificateTransfer.lean:90:5: unused variable `hk0`
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [7357/7363] Replayed SubsetSum.Refinement
+⚠ [7357/7364] Replayed SubsetSum.Refinement
 warning: SubsetSum/Refinement.lean:94:40: unused variable `hz0`
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [7360/7363] Replayed SubsetSum.Support
+⚠ [7360/7364] Replayed SubsetSum.Support
 warning: SubsetSum/Support.lean:149:72: this tactic is never executed
 
 Note: This linter can be disabled with `set_option linter.unreachableTactic false`
 warning: SubsetSum/Support.lean:149:72: 'tauto' tactic does nothing
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
-✔ [7361/7363] Built SubsetSum.Signs (3.8s)
-✔ [7362/7363] Built SubsetSum (3.5s)
-Build completed successfully (7363 jobs).
+✖ [7362/7364] Building SubsetSum.Layers (4.3s)
+trace: .> LEAN_PATH=/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/Cli/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/batteries/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/Qq/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/aesop/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/importGraph/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/plausible/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/mathlib/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/lib/lean /home/runner/.elan/toolchains/leanprover--lean4---v4.24.0/bin/lean /home/runner/work/subset-sum-bound/subset-sum-bound/SubsetSum/Layers.lean -o /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/lib/lean/SubsetSum/Layers.olean -i /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/lib/lean/SubsetSum/Layers.ilean -c /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/ir/SubsetSum/Layers.c --setup /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/ir/SubsetSum/Layers.setup.json --json
+error: SubsetSum/Layers.lean:33:66: unsolved goals
+n : ℕ
+w : Fin n → ℤ
+S W : Finset (Fin n)
+hW : W ⊆ S
+hd : Disjoint (S \ W) W
+hu : S \ W ∪ W = S
+⊢ ∑ i ∈ (S \ W ∪ W) \ W, w i + ∑ i ∈ W, w i = ∑ i ∈ S \ W, w i + ∑ i ∈ W, w i
+error: SubsetSum/Layers.lean:75:10: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.356 \ ?m.355) = #?m.356 - #(?m.355 ∩ ?m.356)
+
+Note: Expected a function because this term is being applied to the argument
+  hW.1
+error: SubsetSum/Layers.lean:102:41: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.72 \ ?m.71) = #?m.72 - #(?m.71 ∩ ?m.72)
+
+Note: Expected a function because this term is being applied to the argument
+  hS
+error: SubsetSum/Layers.lean:111:10: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.194 \ ?m.193) = #?m.194 - #(?m.193 ∩ ?m.194)
+
+Note: Expected a function because this term is being applied to the argument
+  hS
+error: Lean exited with code 1
+Some required targets logged failures:
+- SubsetSum.Layers
+error: build failed
 
 $ lake env lean Scratch.lean
-Finset.expect_eq_sum_div_card.{u_1, u_3} {ι : Type u_1} {M : Type u_3} [Semifield M] [CharZero M] (s : Finset ι)
-  (f : ι → M) : (s.expect fun i => f i) = (∑ i ∈ s, f i) / ↑s.card
-Finset.card_powersetCard.{u_1} {α : Type u_1} (n : ℕ) (s : Finset α) : (Finset.powersetCard n s).card = s.card.choose n
-Finset.card_image_iff.{u_1, u_2} {α : Type u_1} {β : Type u_2} {s : Finset α} {f : α → β} [DecidableEq β] :
-  (Finset.image f s).card = s.card ↔ Set.InjOn f ↑s
-List.forall_mem_cons.{u_1} {α : Type u_1} {p : α → Prop} {a : α} {l : List α} : (∀ x ∈ a :: l, p x) ↔ p a ∧ ∀ x ∈ l, p x
-List.forall_mem_nil.{u_1} {α : Type u_1} (p : α → Prop) (x : α) : x ∈ [] → p x
-Finset.sum_fiberwise_of_maps_to.{u_1, u_2, u_4} {ι : Type u_1} {κ : Type u_2} {M : Type u_4} [AddCommMonoid M]
-  {s : Finset ι} {t : Finset κ} [DecidableEq κ] {g : ι → κ} (h : ∀ i ∈ s, g i ∈ t) (f : ι → M) :
-  ∑ j ∈ t, ∑ i ∈ s with g i = j, f i = ∑ i ∈ s, f i
-.lake/packages/mathlib/Mathlib/MeasureTheory/Function/LpSeminorm/ChebyshevMarkov.lean
-.lake/packages/mathlib/Mathlib/NumberTheory/Bertrand.lean
-.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Trigonometric/Chebyshev.lean
-.lake/packages/mathlib/Mathlib/Algebra/Order/Chebyshev.lean
-.lake/packages/mathlib/Mathlib/Algebra/Azumaya
-.lake/packages/mathlib/Mathlib/RingTheory/Polynomial/Chebyshev.lean
-
-
-$ lake env lean Audit.lean
-'SubsetSum.certified_margins' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.pure_exponent_gap' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.low_domination' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.band_domination' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.band_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.coarse_score_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.moment_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.transferred_moment' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.real_log_taylor_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.alias_constraints' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.concrete_refined_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.alias_subtraction' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.isolated_solution_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.zero_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.unit_detected' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.regional_moment_transfer' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.low_moment_refinement' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SubsetSum.bounded_moment_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+Finset.card_sigma.{u_3, u_6} {α : Type u_3} {σ : α → Type u_6} (s : Finset α) (t : (a : α) → Finset (σ a)) :
+  (s.sigma t).card = ∑ a ∈ s, (t a).card
+Finset.sum_sdiff.{u_1, u_4} {ι : Type u_1} {M : Type u_4} {s₁ s₂ : Finset ι} [AddCommMonoid M] {f : ι → M}
+  [DecidableEq ι] (h : s₁ ⊆ s₂) : ∑ x ∈ s₂ \ s₁, f x + ∑ x ∈ s₁, f x = ∑ x ∈ s₂, f x
+Finset.card_sdiff.{u_1} {α : Type u_1} {s t : Finset α} [DecidableEq α] : (t \ s).card = t.card - (s ∩ t).card
+Finset.card_biUnion_le.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [DecidableEq M] {s : Finset ι} {t : ι → Finset M} :
+  (s.biUnion t).card ≤ ∑ a ∈ s, (t a).card
+Finset.exists_max_image.{u_2, u_3} {α : Type u_2} {β : Type u_3} [LinearOrder α] (s : Finset β) (f : β → α)
+  (h : s.Nonempty) : ∃ x ∈ s, ∀ x' ∈ s, f x' ≤ f x
+Nat.choose_mul {n k s : ℕ} (hkn : k ≤ n) (hsk : s ≤ k) : n.choose k * k.choose s = n.choose s * (n - s).choose (k - s)
+Nat.choose_symm {n k : ℕ} (hk : k ≤ n) : n.choose (n - k) = n.choose k
+Finset.powersetCard_nonempty.{u_1} {α : Type u_1} {n : ℕ} {s : Finset α} :
+  (Finset.powersetCard n s).Nonempty ↔ n ≤ s.card
+Finset.sum_subtype.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [AddCommMonoid M] {p : ι → Prop} {F : Fintype (Subtype p)}
+  (s : Finset ι) (h : ∀ (x : ι), x ∈ s ↔ p x) (f : ι → M) : ∑ a ∈ s, f a = ∑ a, f ↑a
+Finset.card_filter.{u_1} {ι : Type u_1} (p : ι → Prop) [DecidablePred p] (s : Finset ι) :
+  {i ∈ s | p i}.card = ∑ i ∈ s, if p i then 1 else 0
