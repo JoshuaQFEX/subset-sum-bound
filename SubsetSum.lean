@@ -11,3 +11,4 @@ import SubsetSum.Support
 import SubsetSum.Signs
 import SubsetSum.Layers
 import SubsetSum.Sampling
+import SubsetSum.SmallLayer
