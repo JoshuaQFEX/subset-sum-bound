@@ -26,20 +26,9 @@ Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
 warning: SubsetSum/Sampling.lean:100:19: unused variable `hav`
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-✖ [7364/7366] Building SubsetSum.SmallLayer (18s)
-trace: .> LEAN_PATH=/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/Cli/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/batteries/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/Qq/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/aesop/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/importGraph/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/plausible/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/packages/mathlib/.lake/build/lib/lean:/home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/lib/lean /home/runner/.elan/toolchains/leanprover--lean4---v4.24.0/bin/lean /home/runner/work/subset-sum-bound/subset-sum-bound/SubsetSum/SmallLayer.lean -o /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/lib/lean/SubsetSum/SmallLayer.olean -i /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/lib/lean/SubsetSum/SmallLayer.ilean -c /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/ir/SubsetSum/SmallLayer.c --setup /home/runner/work/subset-sum-bound/subset-sum-bound/.lake/build/ir/SubsetSum/SmallLayer.setup.json --json
-error: SubsetSum/SmallLayer.lean:146:8: Type mismatch
-  average_complement V (t - k) (Decidable.byContradiction fun a => local_small_layer._proof_1_6 w V k σ t htv hkt a)
-    ?m.205
-has type
-  (@sampleAverage n V (t - k) fun W => ?m.205 (V \ W)) = sampleAverage V (#V - (t - k)) ?m.205
-but is expected to have type
-  (@sampleAverage n V (t - k) fun W => sampleAverage (V \ W) σ fun S => layerDensity w S k) =
-    sampleAverage V (#V - (t - k)) fun A => sampleAverage A σ fun S => layerDensity w S k
-error: Lean exited with code 1
-Some required targets logged failures:
-- SubsetSum.SmallLayer
-error: build failed
+✔ [7364/7366] Built SubsetSum.SmallLayer (9.8s)
+✔ [7365/7366] Built SubsetSum (3.8s)
+Build completed successfully (7366 jobs).
 
 $ lake env lean Scratch.lean
 Nat.choose_pos {n k : ℕ} : k ≤ n → 0 < n.choose k
@@ -72,3 +61,23 @@ Real.rpow_logb {b x : ℝ} (b_pos : 0 < b) (b_ne_one : b ≠ 1) (hx : 0 < x) : b
 .lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:320:theorem choose_le_choose {a b : ℕ} (c : ℕ) (h : a ≤ b) : choose a c ≤ choose b c :=
 .lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:323:theorem choose_mono (b : ℕ) : Monotone fun a => choose a b := fun _ _ => choose_le_choose b
 
+
+$ lake env lean Audit.lean
+'SubsetSum.certified_margins' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.pure_exponent_gap' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.low_domination' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.band_domination' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.band_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.coarse_score_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.moment_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.transferred_moment' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.real_log_taylor_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.alias_constraints' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.concrete_refined_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.alias_subtraction' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.isolated_solution_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.zero_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.unit_detected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.regional_moment_transfer' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.low_moment_refinement' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.bounded_moment_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
