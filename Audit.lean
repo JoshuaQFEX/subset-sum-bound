@@ -9,3 +9,5 @@ import SubsetSum
 #print axioms SubsetSum.moment_shift
 #print axioms SubsetSum.transferred_moment
 #print axioms SubsetSum.real_log_taylor_bound
+#print axioms SubsetSum.alias_constraints
+#print axioms SubsetSum.concrete_refined_bound

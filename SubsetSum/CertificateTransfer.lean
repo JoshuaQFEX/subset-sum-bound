@@ -1,7 +1,7 @@
 /-
 Author: Joshua Wharton, QFEX, joshua@qfex.com
-Prepared with ChatGPT. The algebraic and integral certificate-transfer argument.
-Old moment bounds are theorem hypotheses, not claims made by this file.
+Prepared with ChatGPT. Algebraic and integral certificate transfer.
+Old moment bounds are explicit theorem hypotheses.
 -/
 import SubsetSum.Parameters
 
@@ -11,7 +11,6 @@ namespace SubsetSum
 noncomputable section
 open MeasureTheory
 
-/-- The actual sampling rule, including the old/new boundary mismatch. -/
 def samplingFraction (g W : ℝ) : ℝ := if W ≤ g then 1 else g / W
 
 theorem sampling_low_bounds {g gb W : ℝ} (hg : 0 < g)
@@ -40,9 +39,9 @@ theorem sampling_band_bounds {g gb W L z : ℝ} (hg : 0 < g)
     nlinarith
   have hzinv : 1 / L ≤ z := (div_le_iff₀ hLp).2 hz
   simp only [samplingFraction, if_neg (not_le.mpr hgW)]
-  exact ⟨rfl, div_pos hg hWp, hfrac.trans hzinv⟩
+  exact ⟨True.intro, div_pos hg hWp, hfrac.trans hzinv⟩
 
-/-- Domination in the entire OLD low region; alpha is not assumed to be one. -/
+/-- Includes the thin interval between the new and old low-region boundaries. -/
 theorem low_domination {D q0 alpha U z : ℝ}
     (hD : 0 ≤ D) (hq : 0 < q0) (ha : q0 ≤ alpha)
     (ha1 : alpha ≤ 1) (hz : 1 ≤ z) (hs : alpha * U < D) :
@@ -57,7 +56,6 @@ theorem low_domination {D q0 alpha U z : ℝ}
     (sub_nonneg.mpr hu.le)
   nlinarith
 
-/-- Domination in bounded bands and the tail. -/
 theorem band_domination {D A W U alpha z : ℝ} (ha : 0 < alpha)
     (haz : alpha ≤ z) (hbudget : alpha * (A * W) = D)
     (hs : alpha * U < D) : -alpha * U ≤ -D + z * (A * W - U) := by
@@ -65,13 +63,11 @@ theorem band_domination {D A W U alpha z : ℝ} (ha : 0 < alpha)
   have hp := mul_nonneg (sub_nonneg.mpr haz) (sub_nonneg.mpr hu.le)
   nlinarith [hbudget]
 
-/-- The exact low-region exponent shift. -/
 theorem low_shift (D qb db gb u w z0 z1 rest : ℝ) :
     z0 * (D / qb - u) + z1 * (gb - w) + rest =
       (z0 * (db - u) + z1 * (gb - w) + rest) + z0 * (D / qb - db) := by
   ring
 
-/-- Raising the upper-bound multiplier cancels the variable-dependent change. -/
 theorem band_shift (A Ab gb L H u w z0 z1 z2 rest : ℝ) :
     z0 * (A * w - u) + z1 * (w - gb * L) +
         (z2 + z0 * (A - Ab)) * (gb * H - w) + rest =
@@ -81,28 +77,32 @@ theorem band_shift (A Ab gb L H u w z0 z1 z2 rest : ℝ) :
 
 theorem upper_multiplier_nonnegative {z0 z2 A Ab : ℝ}
     (hz0 : 0 ≤ z0) (hz2 : 0 ≤ z2) (hA : Ab ≤ A) :
-    0 ≤ z2 + z0 * (A - Ab) := by positivity
+    0 ≤ z2 + z0 * (A - Ab) :=
+  add_nonneg hz2 (mul_nonneg hz0 (sub_nonneg.mpr hA))
 
 theorem tail_shift_bound {z A Ab w B old : ℝ}
     (hz : 0 ≤ z) (hA : Ab ≤ A) (hw : w ≤ B) :
     old + z * (A - Ab) * w ≤ old + z * (A - Ab) * B := by
-  exact add_le_add_left (mul_le_mul_of_nonneg_left hw (by positivity)) old
+  exact add_le_add_left
+    (mul_le_mul_of_nonneg_left hw (mul_nonneg hz (sub_nonneg.mpr hA))) old
 
-/-- The elementary absolute-value estimate used for all tail scores. -/
 theorem coarse_score_bound {k B L H : ℝ}
     (hk0 : 1 ≤ k) (hk1 : k ≤ 2)
     (hB : |B| ≤ 64) (hL : |L| ≤ 64) (hH : |H| ≤ 64 * k) :
     |(2 - k) * B - 2 * L + H| ≤ 256 := by
+  have hk : 0 ≤ 2 - k := by linarith
   calc
     |(2 - k) * B - 2 * L + H| ≤ |(2 - k) * B - 2 * L| + |H| := abs_add_le _ _
-    _ ≤ |(2 - k) * B| + |2 * L| + |H| := by gcongr; exact abs_sub_le _ _
+    _ ≤ |(2 - k) * B| + |2 * L| + |H| :=
+      add_le_add_right (abs_sub_le ((2 - k) * B) (2 * L)) |H|
     _ = (2 - k) * |B| + 2 * |L| + |H| := by
-      rw [abs_mul, abs_mul, abs_of_nonneg (by linarith : 0 ≤ 2 - k)]
+      rw [abs_mul, abs_mul, abs_of_nonneg hk]
       norm_num
-    _ ≤ (2 - k) * 64 + 2 * 64 + 64 * k := by gcongr
+    _ ≤ (2 - k) * 64 + 2 * 64 + 64 * k :=
+      add_le_add (add_le_add (mul_le_mul_of_nonneg_left hB hk)
+        (mul_le_mul_of_nonneg_left hL (by norm_num))) hH
     _ = 256 := by ring
 
-/-- Real-valued 2^x, written through exp to make integral identities transparent. -/
 def exp2 (x : ℝ) : ℝ := Real.exp (Real.log 2 * x)
 
 theorem exp2_pos (x : ℝ) : 0 < exp2 x := Real.exp_pos _
@@ -132,7 +132,6 @@ theorem moment_shift (ν : Measure Ω) (M E : Ω → ℝ) (c : ℝ) :
     ring
   rw [hf, integral_const_mul]
 
-/-- A genuine integral inequality, with integrability stated explicitly. -/
 theorem moment_transfer_bound (ν : Measure Ω) (M Eold Enew : Ω → ℝ) (c : ℝ)
     (hM : ∀ x, 0 ≤ M x) (hE : ∀ x, Enew x ≤ Eold x + c)
     (hold : Integrable (fun x => M x * exp2 (Eold x)) ν)
@@ -147,7 +146,7 @@ theorem moment_transfer_bound (ν : Measure Ω) (M Eold Enew : Ω → ℝ) (c : 
            _ = exp2 c * (M x * exp2 (Eold x)) := by rw [exp2_add]; ring
     _ = exp2 c * moment ν M Eold := by rw [integral_const_mul]; rfl
 
-/-- Combining an OLD moment bound with the proved transfer and a scalar margin. -/
+/-- OLD moment bounds are explicit assumptions; the transfer itself is proved. -/
 theorem transferred_moment (ν : Measure Ω) (M Eold Enew : Ω → ℝ)
     (oldEta oldMargin newEta newMargin c : ℝ)
     (hM : ∀ x, 0 ≤ M x) (hE : ∀ x, Enew x ≤ Eold x + c)

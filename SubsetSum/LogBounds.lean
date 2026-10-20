@@ -32,7 +32,7 @@ theorem real_log_taylor_bound (n : ℕ) {x : ℝ} (hx : |x| < 1) :
     push_cast
     rfl
   rw [hlog, ← Complex.ofReal_sub] at h
-  simpa using h
+  simpa only [Complex.norm_real, Real.norm_eq_abs, Nat.cast_add, Nat.cast_one] using h
 
 /-- A rational interval certificate is accepted only after its analytic premise is proved. -/
 theorem log_interval (n : ℕ) (x lo hi : ℝ) (hx : |x| < 1)
