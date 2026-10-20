@@ -1,0 +1,41 @@
+name: Active Lean development check
+on:
+  push:
+    branches: [complete-isolation]
+    paths: ['.github/workflows/live-lean.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  statuses: write
+concurrency:
+  group: active-lean-development
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install the pinned toolchain
+        run: |
+          curl --retry 3 -fsSL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Prepare pinned mathematical libraries
+        run: |
+          lake update || lake update
+          lake exe cache get
+      - name: Check source revisions during this active development session
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp tools/live_lean_check.py /tmp/live_lean_check.py
+          python3 /tmp/live_lean_check.py
+      - name: Preserve exact per-revision verification logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: incremental-lean-proof-logs
+          path: /tmp/live-proof-logs/
+          if-no-files-found: ignore
+          retention-days: 7
