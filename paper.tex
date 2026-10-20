@@ -1,0 +1,583 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs,array}
+\usepackage{microtype}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyvrb}
+\hypersetup{pdftitle={A conditional refinement of the Subset Sum exponent to 0.487676},pdfsubject={Parameter refinement and transfer of checksum certificates}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newcommand{\Base}{\ensuremath{\mathcal{B}}}
+\newcommand{\poly}{\operatorname{poly}}
+\newcommand{\Torus}{\mathbb{T}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\logtwo}{\log_2}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.16}
+\allowdisplaybreaks
+\title{A conditional refinement of the Subset Sum\texorpdfstring{\\}{ }exponent to \texorpdfstring{$0.487676$}{0.487676}}
+\author{}
+\date{20 October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give a parameter and certificate refinement of the claimed
+$O(2^{0.4877n})$ Subset Sum construction in the pinned manuscript
+\Base~\cite{baseline}. The internal work exponent is reduced from
+$0.48769$ to $0.48767595$. A transfer argument preserves the existing
+43 filters and derives the required new moment bounds from their
+430 original certificates, without new quadrature. Together with exact
+rational checks of the alias constraints, this gives the conditional
+bound $O_c(2^{0.487676n})$ for every fixed polynomial input-bit-length
+bound $b\le n^c$. The qualification is essential: the algorithmic lemmas
+and original moment inequalities of \Base\ are inherited premises, not
+independently verified here. This note is not a formal proof-assistant
+verification, a literature-priority claim, or a practical speedup claim.
+\end{abstract}
+
+\section{Statement and dependencies}
+\label{sec:statement}
+
+Let \Base\ denote \texttt{subset-sum/PROOF\_0.4877.tex} in
+\texttt{a-kapila/maths-proofs}, pinned at commit
+\texttt{44c34961b56784c220a6e913cc068d57dc37c5a3}~\cite{baseline}.
+That manuscript relies on the 4 October 2026 preprint
+\emph{Subset Sum in Time $O(2^{0.49n})$}~\cite{original}.
+The intended specification is the Subset Sum benchmark~\cite{benchmark};
+no assertion about its current leaderboard is needed for this note.
+
+The inherited premises are the isolation and implementation lemmas,
+the preliminary-search and alias arguments under their numerical side
+conditions, the parameterised checksum construction, finite-circle
+convergence, and the certified continuous moment bounds of \Base.
+References to numbered statements of \Base\ refer to that pinned version.
+
+\begin{theorem}[Conditional refinement]
+\label{thm:main}
+Assume these inherited premises of \Base\ are valid. There is a single
+uniform randomised classical word-RAM program which halts on every input
+and is correct with probability at least $2/3$. For each fixed positive
+integer $c$, there are constants $C_c,N_c>0$ such that, for every input
+with $n\ge N_c$ and $b\le n^c$, every random execution uses at most
+\[
+ C_c\,2^{0.487676n}
+\]
+word operations. Here $b$ is the largest bit length of an input integer
+or the target, with the conventions of \Base, and the word length is
+\[
+ w_{\mathrm{RAM}}=\left\lceil4\bigl(n+b+\logtwo(n+2)\bigr)\right\rceil.
+\]
+The program does not depend on $c$.
+\end{theorem}
+
+The baseline internal constants are
+\begin{equation}
+\label{eq:baseline}
+ \tau_b=0.48769,\qquad \eta_b=0.51613,\qquad
+ \Delta_b=0.02844,\qquad \Gamma_b=0.45925.
+\end{equation}
+Its displayed exponent $0.4877$ absorbs overhead beyond the linear
+exponent $0.4876902$. The refinement below changes the internal work
+exponent; it does not merely spend the baseline's rounding slack.
+
+\section{Parameters and input guard}
+\label{sec:parameters}
+
+All terminating decimals in the parameter table are exact rational
+numbers. The machine-readable values are in \texttt{parameters.json}.
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Parameter & Exact value & Meaning\\
+\midrule
+$\tau$ & $0.48767595$ & Internal work exponent\\
+$\eta$ & $0.51612858$ & Large-prime exponent\\
+$a$ & $0.008145205148$ & Mask fraction\\
+$\mu$ & $0.475442899283$ & Large-block fraction\\
+$\gamma$ & $0.060035950245$ & Small-prime parameter\\
+$l$ & $0.483780402235$ & Left-block fraction\\
+$r=1-\mu-l$ & $0.040776698482$ & Right-block fraction\\
+$\eps$ & $10^{-11}$ & Pattern accuracy\\
+$\zeta$ & $10^{-11}$ & Preliminary-search slack\\
+\bottomrule
+\end{tabular}
+\end{center}
+The new checksum budgets are
+\begin{equation}
+\label{eq:budgets}
+ \Delta=\eta-\tau=0.02845263,\qquad
+ \Gamma=2\tau-\eta=0.45922332.
+\end{equation}
+Retain the baseline's 43 filters, filter-selection rule, isolation
+transformation, and final decision rule. Construct checksum tables and
+choose the sampling fraction using the \emph{new} budgets. The regions
+used in the certificate analysis will retain the \emph{old} boundaries.
+
+Replace the input guard by
+\begin{equation}
+\label{eq:guard}
+ 10^{11}\left\lceil\logtwo(b+1)\right\rceil\le n.
+\end{equation}
+When the guard fails, or $n$ is below a sufficiently large fixed cutoff,
+use the exact meet-in-the-middle fallback of \Base. For each fixed $c$,
+the guard eventually holds whenever $b\le n^c$. On inputs passing it,
+\begin{equation}
+\label{eq:bitfactor}
+ b+2\le 2^{10^{-11}n+1}.
+\end{equation}
+The bit-length factor in the alias analysis therefore consumes at most
+$10^{-11}$ of the linear-exponent budget.
+
+\section{Alias work and coverage}
+\label{sec:alias}
+
+Write
+\[
+ h(x)=-x\logtwo x-(1-x)\logtwo(1-x).
+\]
+The strict alias constraints of \Base, Section 2.2, become
+\begin{align}
+ \gamma &< \tfrac12 h(2a), \tag{C1}\label{c1}\\
+ l+\bigl(h(a)-\gamma\bigr)\mu &<\tau, \tag{C2}\label{c2}\\
+ r+(1-\gamma)\mu &<\tau, \tag{C3}\label{c3}\\
+ 1-\mu+\bigl(h(a)+h(\tfrac12-a)-\gamma\bigr)\mu-\eta
+ &<\tau, \tag{C4}\label{c4}\\
+ h(\tfrac12-a)\mu+\tfrac12-\tau &<\tau, \tag{C5}\label{c5}\\
+ 0<r<\tau,\qquad l&<\tau, \tag{C6}\label{c6}\\
+ \mu(1-2a)&<l, \tag{C7}\label{c7}\\
+ \tfrac{\mu}{2}\logtwo3&<\eta. \tag{C8}\label{c8}
+\end{align}
+These respectively control representation coverage, left lists, right
+value classes, matching, mask enumeration, value-map construction,
+deficiency accounting, and reduction on half-blocks.
+
+The accompanying exact-rational interval checker verifies all eight
+constraints. The tightest five have the following approximate slacks:
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Constraint & Positive slack\\
+\midrule
+Coverage, (C1) & $1.84806989556\times10^{-8}$\\
+Left list, (C2) & $1.84818109678\times10^{-8}$\\
+Right value classes, (C3) & $1.84806927342\times10^{-8}$\\
+Matched pairs, (C4) & $1.84813377432\times10^{-8}$\\
+Right-mask enumeration, (C5) & $1.84815267754\times10^{-8}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Every tested alias and auxiliary size inequality has slack at least
+\begin{equation}
+\label{eq:alias-slack}
+ \delta_{\mathrm{alias}}=1.8480692734174335\times10^{-8}.
+\end{equation}
+The auxiliary checks include
+\begin{equation}
+\label{eq:aux}
+ 0<a<\tfrac14,\qquad
+ \mu(1-2a)<\tfrac12,\qquad
+ \tfrac12h(2a)+h(a)<1-2a,
+\end{equation}
+and $h(a)<h(\tfrac12-a)$. The layer inequality supplies the combinatorial
+size condition in the averaged small-layer argument of \Base.
+
+In particular,
+\[
+ \zeta+10^{-11}=2\times10^{-11}<\delta_{\mathrm{alias}}.
+\]
+Thus the preliminary-search slack and input-bit-length factor fit
+strictly inside the alias work margin. Under the inherited alias
+premises, the preliminary-search, coverage, expected-work and cap
+arguments carry over with the new constants. The capped alias cost is
+\begin{equation}
+\label{eq:alias-time}
+ 2^{\tau n+O(n^{0.7})}\poly(n+b).
+\end{equation}
+Strict inequalities absorb the integer rounding of block and mask
+sizes for sufficiently large $n$, as in \Base.
+
+\section{Transferring the checksum certificates}
+\label{sec:transfer}
+
+Optimising the alias constraints alone would not establish the claimed
+refinement. The checksum budgets change as well, so both moment bounds
+and their domination of sampled patterns must be preserved.
+
+Use the baseline score functions $u_v(x),w_v(x)$ for
+$v\in\{0,\ldots,42\}$. For each pattern, the selected filter maximises
+its approximate score $U_v$; write $U,W$ for that filter's scores.
+The baseline guarantees $W\ge0$. The new sampling fraction is
+\begin{equation}
+\label{eq:alpha}
+ \alpha=\begin{cases}
+ 1,&W\le\Gamma,\\
+ \Gamma/W,&W>\Gamma.
+ \end{cases}
+\end{equation}
+A sampled pattern satisfies $\alpha U<\Delta$.
+
+Set
+\begin{equation}
+\label{eq:transfer-params}
+ q=\frac{\Gamma}{\Gamma_b},\qquad
+ A_b=\frac{\Delta_b}{\Gamma_b},\qquad
+ A=\frac{\Delta}{\Gamma},\qquad
+ K=\frac{\Delta}{q}-\Delta_b.
+\end{equation}
+These constants satisfy
+\begin{equation}
+\label{eq:transfer-identity}
+ 0<q<1,\qquad K>0,\qquad A-A_b=K/\Gamma_b,
+\end{equation}
+with approximate values
+\begin{align*}
+ q&=0.999941905280348394120849\ldots,\\
+ K&=0.00001428304359630517021652994\ldots,\\
+ A-A_b&=0.00003110080260491055028095796\ldots.
+\end{align*}
+Retain the old region boundaries $\Gamma_b$ times
+\[
+ 1,\ 1.25,\ 1.6,\ 2,\ 2.6,\ 3.5,\ 5,\ 8,\ 15,\ \infty.
+\]
+These are boundaries for the proof, not for constructing the new tables.
+
+Each old certificate has a nonnegative multiplier vector $z$ and
+an affine row vector $G_b(x)$. Write
+\[
+ I_b=\int_{\Torus} M(x)^2\,2^{z\cdot G_b(x)}\,dx,
+ \qquad M(x)^2=2+2\cos x,
+\]
+where $\Torus=\mathbb{R}/2\pi\mathbb{Z}$ has normalised measure. Comparison
+rows $u_v-u_j$ correspond to other filters $j$ and are nonnegative at
+the pattern level because $v$ was selected to maximise $U_v$.
+
+\begin{lemma}[Certificate transfer]
+\label{lem:transfer}
+Assume \eqref{eq:transfer-identity}. The old certificates can be modified
+as follows. Each modification retains the required domination for
+sampled patterns in the old region.
+\begin{enumerate}
+\item For $W\le\Gamma_b$, replace the first row $\Delta_b-u$ by
+      $\Delta/q-u$, leaving all multipliers unchanged. Then
+      $I'=2^{z_0K}I_b$.
+\item For $\Gamma_bL<W\le\Gamma_bH$ with finite $H$ and $L\ge1$,
+      replace $A_bw-u$ by $Aw-u$ and replace the multiplier of
+      $\Gamma_bH-w$ by $z_2+z_0(A-A_b)$. Then
+      $I'=2^{z_0KH}I_b$.
+\item For $W>15\Gamma_b$, replace $A_bw-u$ by $Aw-u$ and leave all
+      multipliers unchanged. If $w_v(x)\le B$ on the real circle, then
+      $I'\le2^{Bz_0(A-A_b)}I_b$.
+\end{enumerate}
+Here $I'$ denotes the integral of the modified certificate.
+\end{lemma}
+
+\begin{proof}
+In the low region, \eqref{eq:alpha} gives $q\le\alpha\le1$. Put
+$\Theta=\Delta/q=\Delta_b+K$. Sampling implies
+$U<\Delta/\alpha\le\Theta$. The old condition $z_0\ge1$ gives
+\begin{equation}
+\label{eq:low-domination}
+ -\alpha U
+ =-\Delta+\alpha(\Delta/\alpha-U)
+ \le-\Delta+z_0(\Theta-U).
+\end{equation}
+All remaining region and comparison rows are nonnegative at the
+pattern level. Pointwise, the modified exponent is the old exponent
+plus $z_0K$, proving the first integral identity. This includes the
+interval $\Gamma<W\le\Gamma_b$, where $\alpha$ is less than one.
+
+In a bounded region the old first three rows are
+\[
+ \bigl(A_bw-u,\ w-\Gamma_bL,\ \Gamma_bH-w\bigr).
+\]
+The multiplier increase is nonnegative. The change in the total
+exponent is exactly
+\begin{equation}
+\label{eq:band-cancellation}
+ z_0(A-A_b)w+z_0(A-A_b)(\Gamma_bH-w)=z_0KH.
+\end{equation}
+The old condition $z_0L\ge1$ implies
+$\alpha<q/L<1/L\le z_0$. Moreover $\alpha AW=\Delta$ and sampling
+implies $AW-U>0$. Hence
+\begin{equation}
+\label{eq:band-domination}
+ -\alpha U=-\Delta+\alpha(AW-U)
+ \le-\Delta+z_0(AW-U).
+\end{equation}
+The remaining rows are again nonnegative. This proves the second case.
+
+In the unbounded region, $15z_0\ge1$ and $\alpha<q/15$ give the same
+domination argument. The exponent changes by $z_0(A-A_b)w(x)$, which
+is at most $Bz_0(A-A_b)$. Positivity of $M(x)^2$ on the real circle
+then proves the final integral bound.
+\end{proof}
+
+The lemma establishes ideal pattern-level domination. The effect of
+approximating the coordinate scores is accounted for explicitly in
+Section~\ref{sec:error}; it is not silently omitted from the transfer.
+
+\subsection{A pointwise bound for the tail}
+
+\begin{lemma}[Coarse score bound]
+\label{lem:score}
+For each of the 43 baseline filters, $|w_v(x)|\le256$ on the real circle.
+\end{lemma}
+\begin{proof}
+The finite data in Appendix A of \Base\ give eight cosine coefficients
+for each of $r_v,s_v$, each of absolute value at most $2$, and a power
+parameter $1\le\kappa_v\le2$. Suppress the filter index. Thus
+$|r(x)|,|s(x)|\le16$. With normalised integrals, put
+\begin{align*}
+ F&=2^r,& G&=2^s,& Z_f&=\int F,& Z_g&=\int G,\\
+ Z_{f,\kappa}&=\int F^\kappa,&
+ Z_{g,\kappa}&=\int G^\kappa.
+\end{align*}
+Let
+\begin{align*}
+ \mathcal P(x)&=\int F(x+y)G(y)\,dy,\\
+ \mathcal Y(x)&=\int F(x+y)G(y)\bigl(r(x+y)+s(y)\bigr)\,dy.
+\end{align*}
+The identities inherited from \Base\ are
+\begin{align*}
+ L(x)&=\logtwo\mathcal P(x)-\logtwo(Z_fZ_g),\\
+ B_*(x)&=\mathcal Y(x)/\mathcal P(x)-\logtwo(Z_fZ_g),\\
+ H_*&=\logtwo Z_{f,\kappa}+\logtwo Z_{g,\kappa}
+       -\kappa\logtwo(Z_fZ_g),\\
+ w(x)&=(2-\kappa)B_*(x)-2L(x)+H_*.
+\end{align*}
+Positivity gives $|\logtwo(Z_fZ_g)|\le32$ and
+$|\logtwo\mathcal P(x)|\le32$. Also $\mathcal Y/\mathcal P$ is a
+weighted average of $r(x+y)+s(y)$, so its absolute value is at most
+$32$. Consequently
+\[
+ |L|\le64,\qquad |B_*|\le64,\qquad |H_*|\le64\kappa.
+\]
+Because $2-\kappa\ge0$,
+\[
+ |w|\le(2-\kappa)64+128+64\kappa=256.
+\]
+\end{proof}
+
+\section{Moment margins and approximation errors}
+\label{sec:error}
+
+The following rounded-down moment margins are inherited from
+Proposition B and Section 8.2 of \Base. They are assumptions of this
+note, not quadratures evaluated by the new checker.
+\begin{center}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Old region & Lower bound on $\eta_b-\logtwo I_b$\\
+\midrule
+$\rho_0$: $W\le\Gamma_b$ & $0.00025$\\
+$\rho_1$: $\Gamma_b<W\le1.25\Gamma_b$ & $0.00025$\\
+$\rho_2,\ldots,\rho_8$ & $4$\\
+$\rho_9$: $W>15\Gamma_b$ & $17$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The finite source data give
+\[
+ \max_v z_0^{(v,\rho_0)}=17.211,\qquad
+ \max_v z_0^{(v,\rho_1)}=8.4537.
+\]
+The baseline bounds every multiplier-vector sum by $Z=418.36$.
+These values and the transcribed filter data are recorded in
+\texttt{source\_facts.json}. The optional source audit checks the
+transcriptions against a supplied local copy of the pinned TeX source.
+
+\begin{proposition}[Transferred continuous moments]
+\label{prop:moments}
+Assuming the old moment margins above, every modified certificate has
+$\eta-\logtwo I'>10^{-6}$. Every modified multiplier sum is less than
+$419$.
+\end{proposition}
+\begin{proof}
+Since $\eta-\eta_b=-0.00000142$, Lemmas~\ref{lem:transfer}
+and~\ref{lem:score} give lower bounds
+\begin{align*}
+ m_0&=0.00025+(\eta-\eta_b)-17.211K
+       >0.0000027545366639917,\\
+ m_1&=0.00025+(\eta-\eta_b)-8.4537(1.25)K
+       >0.0000976492929373937,\\
+ m_{2:8}&=4+(\eta-\eta_b)-418.36(15)K
+       >3.9103667682,\\
+ m_9&=17+(\eta-\eta_b)-418.36(256)(A-A_b)
+       >13.6690976448.
+\end{align*}
+All are strictly greater than $10^{-6}$. For the bounded regions use
+$z_0\le Z$ and $H\le15$; for the tail use $z_0\le Z$.
+The only multiplier increase is $z_0(A-A_b)$, so every modified sum
+is at most $Z(1+A-A_b)<419$. These are exact rational inequalities
+verified by \texttt{verify.py}.
+\end{proof}
+
+There are only finitely many new, fixed affine certificates. The
+finite-circle convergence premise of \Base\ therefore supplies a
+finite-circle moment margin of $10^{-6}$ for all sufficiently large
+primes. The strict continuous margin in
+Proposition~\ref{prop:moments} is what permits this invocation of
+convergence; convergence itself is not proved by the scalar checker.
+
+The coordinate-average errors inherited from the baseline are
+$|U_v-\bar u_v|\le3\eps$ and $|W_v-\bar w_v|\le4\eps$.
+Each modified affine row has error at most $6\eps$. In particular,
+$Aw-u$ has error at most $(4A+3)\eps<4\eps$ since $A<1/4$;
+comparison rows have error at most $6\eps$. Fixed region constants
+introduce no additional error.
+
+The domination proof and baseline mean-square-error argument therefore
+leave the positive exponent
+\begin{equation}
+\label{eq:error-exponent}
+ 10^{-6}-(18+6\cdot419)\eps
+ =9.7468\times10^{-7}.
+\end{equation}
+For each sampled pattern the corresponding mean-square error, restricted
+to the baseline good-table event, is at most
+\[
+ 2^{-(9.7468\times10^{-7})n+O(1)}.
+\]
+The $2^{O(\sqrt n)}$ patterns and polynomially many targets are absorbed
+by this strict exponential decay. The inherited good-table probability,
+Cauchy--Schwarz, Markov's inequality and a union bound give the same
+constant absolute-error guarantees as \Base, with probability $1-o(1)$.
+
+\section{Correctness and pure exponential time}
+\label{sec:time}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Use the baseline program with the constants and guard of
+Section~\ref{sec:parameters}, retaining its bounded samplers, caps and
+exact fallback. The preliminary search and alias procedure remain valid
+under the inherited premises and the strict checks in
+Section~\ref{sec:alias}. Sections~\ref{sec:transfer}--\ref{sec:error}
+supply the replacement checksum moment and error analysis.
+
+The exact modular checksum minus the exact alias phase sum is the phase
+sum over subsets representing the unreduced target. On a NO instance
+it is zero. When isolation produces a unique representing subset for
+some target, its absolute value is one. The threshold $1/2$ therefore
+separates these cases on the inherited success events. Isolation and
+the vanishing failure probabilities give correctness at least $2/3$
+above a sufficiently large fixed cutoff. The fallback is exact below
+the cutoff and whenever the guard fails.
+
+The work caps and bounded samplers ensure halting and the resource bound
+on every random outcome, not merely in expectation. Prime generation
+costs $2^{\eta n/2}\poly(n+b)$, which is below the work budget. The total
+cost has the inherited form
+\begin{equation}
+\label{eq:total-time}
+ T(n,b)\le
+ 2^{(\tau+20\eps)n+O(n^{0.7})}\poly(n+b)
+ =2^{0.4876759502n+O(n^{0.7})}\poly(n+b).
+\end{equation}
+For fixed $c$ and $b\le n^c$, the guard eventually holds and
+\[
+ 0.487676-(\tau+20\eps)=4.98\times10^{-8}>0.
+\]
+This linear-exponent gap absorbs both the subexponential factor and
+$\poly(n+n^c)$. Thus \eqref{eq:total-time} is
+$O_c(2^{0.487676n})$. The inherited address-space argument applies with
+the same word length. All cutoffs and program parameters are fixed
+independently of $c$.
+\end{proof}
+
+\begin{remark}
+The cutoff and hidden constants may be very large. This argument gives
+an asymptotic conditional refinement, not a demonstrated practical
+speedup. It does not establish that $0.487676$ is optimal even within
+the inherited framework.
+\end{remark}
+
+\section{Reproducibility and verification scope}
+\label{sec:verification}
+
+The accompanying files are \texttt{paper.tex}, \texttt{verify.py},
+\texttt{parameters.json}, \texttt{source\_facts.json}, and
+\texttt{verification.txt}. A \texttt{Makefile} provides the convenience
+targets \texttt{verify} and \texttt{pdf}; neither target accesses the
+network. To repeat the scalar checks, run
+\begin{Verbatim}[fontsize=\small]
+python3 verify.py
+\end{Verbatim}
+An optional audit of the finite baseline data is available as
+\begin{Verbatim}[fontsize=\small]
+python3 verify.py --baseline /path/to/PROOF_0.4877.tex
+\end{Verbatim}
+The source file should be obtained from the exact commit in
+reference~\cite{baseline}. This optional audit checks transcribed data
+and multiplier rows; it does not check the original integrals or
+algorithmic correctness, nor authenticate the downloaded file's
+provenance.
+
+The checker uses only Python's standard library. Every inequality
+decision uses \texttt{fractions.Fraction}. Logarithms are enclosed by
+range reduction and, for $1\le y\le2$, the expansion
+\begin{equation}
+\label{eq:log-series}
+ \ln y=2\sum_{j=0}^{m-1}\frac{z^{2j+1}}{2j+1}+R_m,
+ \qquad z=\frac{y-1}{y+1},
+\end{equation}
+with the exact rational enclosure
+\begin{equation}
+\label{eq:log-tail}
+ 0\le R_m\le\frac{2z^{2m+1}}{(2m+1)(1-z^2)}.
+\end{equation}
+The implementation uses $m=40$. Division by an interval for $\ln2$
+gives intervals for $\logtwo$, and interval operations enclose the
+entropy values. Displayed decimal values are rounded outwards and are
+not used to decide whether inequalities hold.
+
+The included run was repeated on 20 October 2026 and passed the new
+alias constraints, auxiliary size conditions, guard margin,
+moment-transfer bounds, multiplier-sum budget, error exponent and
+pure-exponent gap. It uses the supplied finite-data transcriptions.
+The optional full-source audit and the original 430 quadratures were
+\emph{not} run as part of this verification. All original algorithmic
+and analytic premises remain explicit dependencies.
+
+\paragraph{Provenance and status.}
+This research note and its accompanying checker were prepared with
+ChatGPT. The new certificate-transfer argument is a written derivation;
+the script checks its scalar side conditions. Neither the script nor
+this note is a Lean verification or an independent verification of the
+underlying Subset Sum algorithm. No global optimality or literature
+priority is claimed.
+
+\begin{thebibliography}{9}
+\raggedright
+\bibitem{baseline}
+\texttt{a-kapila/maths-proofs},
+\emph{Subset Sum in time $O(2^{0.4877n})$: a complete proof},
+12 October 2026.
+File \texttt{subset-sum/PROOF\_0.4877.tex}, pinned commit
+\texttt{44c34961b56784c220a6e913cc068d57dc37c5a3}.
+\url{https://github.com/a-kapila/maths-proofs/blob/44c34961b56784c220a6e913cc068d57dc37c5a3/subset-sum/PROOF_0.4877.tex}.
+The title is the source's title; this note treats its results as
+inherited premises.
+
+\bibitem{original}
+OpenAI,
+\emph{Subset Sum in Time $O(2^{0.49n})$},
+OpenAI Math Release preprint, 4 October 2026.
+Repository entry pinned at commit
+\texttt{fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb}.
+\url{https://github.com/openai/math/blob/fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb/preprints/Subset-Sum-in-Time-2-power-0-49n-October-4-2026/README.md}.
+
+\bibitem{benchmark}
+Big O Speedrun, \emph{Subset Sum benchmark}.
+\url{https://bigospeedrun.com/subset-sum}.
+\end{thebibliography}
+\end{document}
