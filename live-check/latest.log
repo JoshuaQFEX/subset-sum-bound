@@ -1,20 +1,20 @@
 $ lake build
-⚠ [7353/7364] Replayed SubsetSum.CertificateTransfer
+⚠ [7353/7365] Replayed SubsetSum.CertificateTransfer
 warning: SubsetSum/CertificateTransfer.lean:90:5: unused variable `hk0`
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [7357/7364] Replayed SubsetSum.Refinement
+⚠ [7357/7365] Replayed SubsetSum.Refinement
 warning: SubsetSum/Refinement.lean:94:40: unused variable `hz0`
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [7360/7364] Replayed SubsetSum.Support
+⚠ [7360/7365] Replayed SubsetSum.Support
 warning: SubsetSum/Support.lean:149:72: this tactic is never executed
 
 Note: This linter can be disabled with `set_option linter.unreachableTactic false`
 warning: SubsetSum/Support.lean:149:72: 'tauto' tactic does nothing
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
-⚠ [7362/7364] Replayed SubsetSum.Layers
+⚠ [7362/7365] Replayed SubsetSum.Layers
 warning: SubsetSum/Layers.lean:154:24: This simp argument is unused:
   Nat.mul_comm
 
@@ -22,7 +22,12 @@ Hint: Omit it from the simp argument list.
   simp ̵[̵N̵a̵t̵.̵m̵u̵l̵_̵c̵o̵m̵m̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-Build completed successfully (7364 jobs).
+⚠ [7363/7365] Built SubsetSum.Sampling (6.8s)
+warning: SubsetSum/Sampling.lean:100:19: unused variable `hav`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [7364/7365] Built SubsetSum (3.4s)
+Build completed successfully (7365 jobs).
 
 $ lake env lean Scratch.lean
 Nat.choose_pos {n k : ℕ} : k ≤ n → 0 < n.choose k
