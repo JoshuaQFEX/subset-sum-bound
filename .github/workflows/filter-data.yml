@@ -41,6 +41,7 @@ jobs:
           name: finite-filter-proof
           path: |
             SubsetSum/FilterData.lean
+            SubsetSum/FilterData/*.lean
             /tmp/filter-data-proof.log
           retention-days: 7
       - name: Publish only the checked finite-data source
