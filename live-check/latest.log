@@ -25,23 +25,36 @@ Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
 Build completed successfully (7364 jobs).
 
 $ lake env lean Scratch.lean
-Finset.card_sigma.{u_3, u_6} {α : Type u_3} {σ : α → Type u_6} (s : Finset α) (t : (a : α) → Finset (σ a)) :
-  (s.sigma t).card = ∑ a ∈ s, (t a).card
-Finset.sum_sdiff.{u_1, u_4} {ι : Type u_1} {M : Type u_4} {s₁ s₂ : Finset ι} [AddCommMonoid M] {f : ι → M}
-  [DecidableEq ι] (h : s₁ ⊆ s₂) : ∑ x ∈ s₂ \ s₁, f x + ∑ x ∈ s₁, f x = ∑ x ∈ s₂, f x
-Finset.card_sdiff.{u_1} {α : Type u_1} {s t : Finset α} [DecidableEq α] : (t \ s).card = t.card - (s ∩ t).card
-Finset.card_biUnion_le.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [DecidableEq M] {s : Finset ι} {t : ι → Finset M} :
-  (s.biUnion t).card ≤ ∑ a ∈ s, (t a).card
-Finset.exists_max_image.{u_2, u_3} {α : Type u_2} {β : Type u_3} [LinearOrder α] (s : Finset β) (f : β → α)
-  (h : s.Nonempty) : ∃ x ∈ s, ∀ x' ∈ s, f x' ≤ f x
+Nat.choose_pos {n k : ℕ} : k ≤ n → 0 < n.choose k
 Nat.choose_mul {n k s : ℕ} (hkn : k ≤ n) (hsk : s ≤ k) : n.choose k * k.choose s = n.choose s * (n - s).choose (k - s)
-Nat.choose_symm {n k : ℕ} (hk : k ≤ n) : n.choose (n - k) = n.choose k
-Finset.powersetCard_nonempty.{u_1} {α : Type u_1} {n : ℕ} {s : Finset α} :
-  (Finset.powersetCard n s).Nonempty ↔ n ≤ s.card
-Finset.sum_subtype.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [AddCommMonoid M] {p : ι → Prop} {F : Fintype (Subtype p)}
-  (s : Finset ι) (h : ∀ (x : ι), x ∈ s ↔ p x) (f : ι → M) : ∑ a ∈ s, f a = ∑ a, f ↑a
-Finset.card_filter.{u_1} {ι : Type u_1} (p : ι → Prop) [DecidablePred p] (s : Finset ι) :
-  {i ∈ s | p i}.card = ∑ i ∈ s, if p i then 1 else 0
+Finset.sum_div.{u_1, u_2} {ι : Type u_1} {K : Type u_2} [DivisionSemiring K] (s : Finset ι) (f : ι → K) (a : K) :
+  (∑ i ∈ s, f i) / a = ∑ i ∈ s, f i / a
+Finset.sum_const.{u_1, u_4} {ι : Type u_1} {M : Type u_4} {s : Finset ι} [AddCommMonoid M] (b : M) :
+  ∑ _x ∈ s, b = s.card • b
+Finset.sum_comm.{u_3, u_4, u_5} {α : Type u_3} {β : Type u_4} {γ : Type u_5} [AddCommMonoid β] {s : Finset γ}
+  {t : Finset α} {f : γ → α → β} : ∑ x ∈ s, ∑ y ∈ t, f x y = ∑ y ∈ t, ∑ x ∈ s, f x y
+Finset.sum_le_sum.{u_1, u_5} {ι : Type u_1} {N : Type u_5} [AddCommMonoid N] [PartialOrder N] {f g : ι → N}
+  {s : Finset ι} [AddLeftMono N] (h : ∀ i ∈ s, f i ≤ g i) : ∑ i ∈ s, f i ≤ ∑ i ∈ s, g i
+Finset.card_image_iff.{u_1, u_2} {α : Type u_1} {β : Type u_2} {s : Finset α} {f : α → β} [DecidableEq β] :
+  (Finset.image f s).card = s.card ↔ Set.InjOn f ↑s
+Finset.sdiff_sdiff_eq_self.{u_1} {α : Type u_1} [DecidableEq α] {s t : Finset α} (h : t ⊆ s) : s \ (s \ t) = t
+Real.rpow_logb {b x : ℝ} (b_pos : 0 < b) (b_ne_one : b ≠ 1) (hx : 0 < x) : b ^ Real.logb b x = x
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Bounds.lean:30:theorem choose_le_pow_div (r n : ℕ) : (n.choose r : α) ≤ (n ^ r : α) / r ! := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Bounds.lean:43:lemma choose_le_descFactorial (n k : ℕ) : n.choose k ≤ n.descFactorial k := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Bounds.lean:50:lemma choose_le_pow (n k : ℕ) : n.choose k ≤ n ^ k :=
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Bounds.lean:64:theorem choose_succ_le_two_pow (n k : ℕ) : (n + 1).choose k ≤ 2 ^ n := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Bounds.lean:81:theorem choose_le_two_pow (n k : ℕ) : n.choose k ≤ 2 ^ n := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Central.lean:50:theorem choose_le_centralBinom (r n : ℕ) : choose (2 * n) r ≤ centralBinom n :=
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Sum.lean:112:theorem choose_middle_le_pow (n : ℕ) : (2 * n + 1).choose n ≤ 4 ^ n := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:63:theorem choose_succ_left (n k : ℕ) (hk : 0 < k) :
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:283:theorem choose_le_succ_of_lt_half_left {r n : ℕ} (h : r < n / 2) :
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:292:private theorem choose_le_middle_of_le_half_left {n r : ℕ} (hr : r ≤ n / 2) :
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:299:theorem choose_le_middle (r n : ℕ) : choose n r ≤ choose n (n / 2) := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:312:theorem choose_le_succ (a c : ℕ) : choose a c ≤ choose a.succ c := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:315:theorem choose_le_add (a b c : ℕ) : choose a c ≤ choose (a + b) c := by
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:320:theorem choose_le_choose {a b : ℕ} (c : ℕ) (h : a ≤ b) : choose a c ≤ choose b c :=
+.lake/packages/mathlib/Mathlib/Data/Nat/Choose/Basic.lean:323:theorem choose_mono (b : ℕ) : Monotone fun a => choose a b := fun _ _ => choose_le_choose b
+
 
 $ lake env lean Audit.lean
 'SubsetSum.certified_margins' depends on axioms: [propext, Classical.choice, Quot.sound]
