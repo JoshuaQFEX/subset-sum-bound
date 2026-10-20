@@ -1,0 +1,74 @@
+name: Offline proof environment parts
+on:
+  push:
+    branches: [complete-isolation]
+    paths: ['.github/workflows/offline-parts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  split:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: portable-lean-environment
+          run-id: 39426164977
+          repository: JoshuaQFEX/subset-sum-bound
+          github-token: ${{ github.token }}
+          path: /tmp/original
+      - name: Split the offline archives and obtain pinned reference sources
+        run: |
+          mkdir -p /tmp/parts /tmp/references
+          split -b 450M -d --additional-suffix=.part /tmp/original/project.tar.zst /tmp/parts/project.
+          cp /tmp/original/toolchain.tar.zst /tmp/parts/
+          cp /tmp/original/SHA256SUMS /tmp/references/
+          python3 - <<'PY'
+          import json, urllib.request
+          from pathlib import Path
+          root = Path('/tmp/references')
+          url = 'https://raw.githubusercontent.com/a-kapila/maths-proofs/44c34961b56784c220a6e913cc068d57dc37c5a3/subset-sum/PROOF_0.4877.tex'
+          root.joinpath('baseline.tex').write_bytes(urllib.request.urlopen(url).read())
+          api = 'https://api.github.com/repos/openai/math/contents/preprints/Subset-Sum-in-Time-2-power-0-49n-October-4-2026/build/sections?ref=fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb'
+          for item in json.load(urllib.request.urlopen(api)):
+              if item['type'] == 'file' and item['name'].endswith('.tex'):
+                  root.joinpath(item['name']).write_bytes(urllib.request.urlopen(item['download_url']).read())
+          PY
+          du -h /tmp/parts/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-toolchain
+          path: /tmp/parts/toolchain.tar.zst
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-project-00
+          path: /tmp/parts/project.00.part
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-project-01
+          path: /tmp/parts/project.01.part
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-project-02
+          path: /tmp/parts/project.02.part
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-project-03
+          path: /tmp/parts/project.03.part
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pinned-mathematical-references
+          path: /tmp/references/
+          retention-days: 1
