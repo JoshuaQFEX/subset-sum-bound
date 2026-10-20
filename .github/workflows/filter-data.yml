@@ -1,0 +1,40 @@
+name: Verify finite filter data
+on:
+  push:
+    branches: [complete-isolation]
+    paths: ['tools/generate_filter_data.py', '.github/workflows/filter-data.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Obtain the exact pinned mathematical data
+        run: |
+          curl --retry 3 -fsSL https://raw.githubusercontent.com/a-kapila/maths-proofs/44c34961b56784c220a6e913cc068d57dc37c5a3/subset-sum/PROOF_0.4877.tex -o /tmp/baseline.tex
+          python3 tools/generate_filter_data.py /tmp/baseline.tex SubsetSum/FilterData.lean
+      - name: Install the pinned toolchain
+        run: |
+          curl --retry 3 -fsSL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch checked libraries
+        run: |
+          lake update || lake update
+          lake exe cache get
+      - name: Kernel-check the generated finite statements
+        run: |
+          set -o pipefail
+          lake env lean SubsetSum/FilterData.lean 2>&1 | tee /tmp/filter-data-proof.log
+          if grep -E '\b(sorry|admit|axiom|native_decide)\b' SubsetSum/FilterData.lean; then exit 1; fi
+      - name: Publish only the checked finite-data source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add SubsetSum/FilterData.lean
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Add kernel-checked original filter and multiplier data'
+          git push origin HEAD:complete-isolation
