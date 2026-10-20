@@ -1,0 +1,81 @@
+name: Publish attributed paper
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/publish-paper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact source revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Add author attribution and PDF navigation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('paper.tex')
+          text = p.read_text()
+          author = r'\author{Joshua Wharton\\[0.4em]\small QFEX\\[0.2em]\small\href{mailto:joshua@qfex.com}{\texttt{joshua@qfex.com}}}'
+          if r'\author{}' in text:
+              text = text.replace(r'\author{}', author, 1)
+          else:
+              assert author in text, 'Unexpected author block; refusing to overwrite it'
+          subject = 'pdfsubject={Parameter refinement and transfer of checksum certificates}'
+          metadata = 'pdfauthor={Joshua Wharton (QFEX)},' + subject
+          if metadata not in text:
+              assert subject in text
+              text = text.replace(subject, metadata, 1)
+          p.write_text(text)
+          p = Path('README.md')
+          text = p.read_text()
+          attribution = '**Author:** Joshua Wharton, QFEX  \n**Email:** [joshua@qfex.com](mailto:joshua@qfex.com)\n\n'
+          if '**Author:** Joshua Wharton' not in text:
+              text = text.replace('# Subset Sum bound\n\n', '# Subset Sum bound\n\n' + attribution, 1)
+          text = text.replace('[LaTeX source](paper.tex). Compile it with `make pdf` to produce `paper.pdf`.', '[Read the paper (PDF)](paper.pdf) | [LaTeX source](paper.tex).\nRebuild the PDF locally with `make pdf`.')
+          text = text.replace('PDFs and intermediate LaTeX files are generated locally and ignored by Git.\n`make clean` removes the generated paper files.', 'The compiled [paper.pdf](paper.pdf) is included in the repository. Intermediate\nLaTeX files remain ignored by Git. `make clean` removes local build outputs;\nrun `make pdf` afterwards to regenerate the PDF.')
+          p.write_text(text)
+          p = Path('.gitignore')
+          text = p.read_text()
+          if '!paper.pdf' not in text:
+              text = text.rstrip() + '\n\n# Publish the compiled paper alongside its source.\n!paper.pdf\n'
+          p.write_text(text)
+          PY
+      - name: Install the LaTeX toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra lmodern poppler-utils
+      - name: Verify and compile
+        run: |
+          make verify
+          make -B pdf
+          if grep -E 'Overfull|undefined references|undefined citations' paper.log; then
+            echo 'The paper requires a layout or reference repair.' >&2
+            exit 1
+          fi
+          pdftotext -f 1 -l 1 paper.pdf first-page.txt
+          grep -F 'Joshua Wharton' first-page.txt
+          grep -F 'QFEX' first-page.txt
+          grep -F 'joshua@qfex.com' first-page.txt
+          pdfinfo paper.pdf
+          rm first-page.txt
+      - name: Commit the attributed source and compiled PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add paper.tex README.md .gitignore
+          git add -f paper.pdf
+          if git diff --cached --quiet; then
+            echo 'The published paper is already up to date.'
+            exit 0
+          fi
+          git commit -m 'Publish paper PDF with Joshua Wharton, QFEX attribution'
+          git push origin HEAD:master
