@@ -40,7 +40,7 @@ def main() -> None:
     parser.add_argument('output', type=Path, help='aggregator path, normally SubsetSum/FilterData.lean')
     args = parser.parse_args()
     data = args.source.read_bytes()
-    blob = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\\0' + data).hexdigest()
+    blob = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
     if blob != BLOB:
         raise ValueError(f'Baseline Git blob {blob} does not match {BLOB}')
 
@@ -48,18 +48,18 @@ def main() -> None:
     certs: dict[tuple[int, int], tuple[list[int], str]] = {}
     for raw in data.decode('utf-8').splitlines():
         line = raw.strip()
-        if not re.match(r'^\\d+\\s*&', line) or not line.endswith('\\\\\\\\'):
+        if not re.match(r'^\d+\s*&', line) or not line.endswith('\\\\'):
             continue
         fields = [x.strip() for x in line[:-2].split('&')]
         if len(fields) != 4:
             continue
         v = int(fields[0])
-        m = re.fullmatch(r'\\$\\\\rho_\\{(\\d+)\\}\\$', fields[1])
+        m = re.fullmatch(r'\$\\rho_\{(\d+)\}\$', fields[1])
         if m:
             key = (v, int(m.group(1)))
             if key in certs:
                 raise ValueError(f'Duplicate certificate {key}')
-            comparisons = [int(x) for x in re.findall(r'\\d+', fields[2])]
+            comparisons = [int(x) for x in re.findall(r'\d+', fields[2])]
             if any(not 0 <= x < 43 for x in comparisons):
                 raise ValueError(f'Invalid comparison index in {key}')
             for x in fields[3].split(','):
@@ -111,7 +111,7 @@ def main() -> None:
         '  (c.region.val = 1 → c.multipliers.headD 0 ≤ (84537/10000 : ℚ))', '',
         'end SubsetSum.FilterData', ''
     ]
-    (outdir / 'Base.lean').write_text('\\n'.join(base), encoding='utf-8')
+    (outdir / 'Base.lean').write_text('\n'.join(base), encoding='utf-8')
 
     imports = ['SubsetSum.FilterData.Base']
     filter_names = [f'filter_{v}' for v in range(43)]
@@ -157,7 +157,7 @@ def main() -> None:
             '  exact ' + list_forall(local_cap_names), '',
             'end SubsetSum.FilterData', ''
         ]
-        (outdir / f'{mod}.lean').write_text('\\n'.join(lines), encoding='utf-8')
+        (outdir / f'{mod}.lean').write_text('\n'.join(lines), encoding='utf-8')
 
     aggregator = [
         '/-', 'Author: Joshua Wharton, QFEX, joshua@qfex.com',
@@ -185,7 +185,7 @@ def main() -> None:
         '    filter_39_certificates, filter_40_certificates, filter_41_certificates, filter_42_certificates]', '',
         'end SubsetSum.FilterData', ''
     ]
-    args.output.write_text('\\n'.join(aggregator), encoding='utf-8')
+    args.output.write_text('\n'.join(aggregator), encoding='utf-8')
     print(f'Pinned source blob {blob}: emitted 43 filters and 430 certificates in small Lean modules.')
 
 
