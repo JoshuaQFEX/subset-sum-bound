@@ -143,8 +143,10 @@ theorem local_small_layer (w : Fin n → ℤ) (V : Finset (Fin n)) (k σ : ℕ)
         exact hσa
       _ = sampleAverage V (V.card - (t - k))
           (fun A => sampleAverage A σ (fun S => layerDensity w S k)) :=
-        average_complement V (t - k) (by omega) _
-      _ = _ := average_of_averages V σ (V.card - (t - k)) hσa (Nat.sub_le _ _) _
+        average_complement V (t - k) (by omega)
+          (fun A => sampleAverage A σ (fun S => layerDensity w S k))
+      _ = _ := average_of_averages V σ (V.card - (t - k)) hσa (Nat.sub_le _ _)
+        (fun S => layerDensity w S k)
   · have htk : t ≤ k := by omega
     have hkv : 2 * k ≤ V.card := by omega
     have hchoose := choose_monotone_below_half V.card t k htk hkv
@@ -200,7 +202,7 @@ theorem averaged_small_layer_fraction (w : Fin n → ℤ) (M : Finset (Fin n)) (
       have h := local_small_layer w V k σ hkσ (by rw [hc]; exact hσv)
         (by rw [hc]; exact hsize)
       simpa only [hc] using h
-    _ = _ := average_of_averages M σ v hsv hvM _
+    _ = _ := average_of_averages M σ v hsv hvM (fun S => layerDensity w S k)
 
 lemma supportFraction_eq_exp_deficiency (w : Fin n → ℤ) (V : Finset (Fin n)) :
     (2 : ℝ) ^ (-deficiency w V) = supportFraction w V := by
