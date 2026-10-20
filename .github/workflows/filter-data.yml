@@ -31,7 +31,8 @@ jobs:
       - name: Kernel-check the generated finite statements
         run: |
           set -o pipefail
-          lake env lean SubsetSum/FilterData.lean 2>&1 | tee /tmp/filter-data-proof.log
+          lake build 2>&1 | tee /tmp/filter-data-proof.log
+          lake env lean SubsetSum/FilterData.lean 2>&1 | tee -a /tmp/filter-data-proof.log
           if grep -E '\b(sorry|admit|axiom|native_decide)\b' SubsetSum/FilterData.lean; then exit 1; fi
           if grep -F 'sorryAx' /tmp/filter-data-proof.log; then exit 1; fi
       - name: Preserve finite-data proof and exact log
