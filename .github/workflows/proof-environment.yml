@@ -1,0 +1,41 @@
+name: Portable proof environment
+on:
+  push:
+    branches: [complete-isolation]
+    paths: ['.github/workflows/proof-environment.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install the pinned proof toolchain
+        run: |
+          curl --retry 3 -fsSL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Resolve pinned dependencies
+        run: |
+          lake update || lake update
+          lake exe cache get
+      - name: Prepare an offline proof environment
+        run: |
+          mkdir -p /tmp/proof-environment
+          TOOLCHAIN=$(dirname "$(dirname "$(elan which lean)")")
+          tar --exclude='*.a' --exclude='*.o' --exclude='*.c' --exclude='*.ilean' --exclude='./src' -I 'zstd -T0 -3' -cf /tmp/proof-environment/toolchain.tar.zst -C "$TOOLCHAIN" .
+          tar --exclude='.git' --exclude='*.a' --exclude='*.o' --exclude='*.c' --exclude='*.ilean' --exclude='node_modules' -I 'zstd -T0 -3' -cf /tmp/proof-environment/project.tar.zst .
+          sha256sum /tmp/proof-environment/*.tar.zst | tee /tmp/proof-environment/SHA256SUMS
+          du -h /tmp/proof-environment/*
+      - name: Store temporary offline environment
+        uses: actions/upload-artifact@v4
+        with:
+          name: portable-lean-environment
+          path: /tmp/proof-environment/
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error

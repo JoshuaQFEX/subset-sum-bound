@@ -146,7 +146,7 @@ theorem deficiency_mono (w : Fin n → ℤ) {U V : Finset (Fin n)} (hUV : U ⊆ 
     induction T using Finset.induction_on with
     | empty => simp
     | @insert i T hi ih =>
-      have he : U ∪ insert i T = insert i (U ∪ T) := by ext j; simp; tauto
+      have he : U ∪ insert i T = insert i (U ∪ T) := by ext j; simp <;> tauto
       rw [he]
       by_cases hmem : i ∈ U ∪ T
       · simpa [Finset.insert_eq_of_mem hmem] using ih
@@ -187,8 +187,10 @@ lemma support_union_card (w : Fin n → ℤ) (U V : Finset (Fin n))
         ⟨(mem_sumSupport w U _).2 ⟨S ∩ U, Finset.inter_subset_right, rfl⟩,
          (mem_sumSupport w V _).2 ⟨S ∩ V, Finset.inter_subset_right, rfl⟩⟩
     · change weightSum w (S ∩ U) + weightSum w (S ∩ V) = weightSum w S
-      rw [← hSsplit]
-      simp only [weightSum, Finset.sum_union hd]
+      calc
+        _ = weightSum w ((S ∩ U) ∪ (S ∩ V)) := by
+          simp only [weightSum, Finset.sum_union hd]
+        _ = weightSum w S := by rw [hSsplit]
   exact (Finset.card_le_card hsub).trans (by simpa using
     (Finset.card_image_le (s := (sumSupport w U) ×ˢ (sumSupport w V)) (f := fun p => p.1 + p.2)))
 

@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-"""Transcribe the pinned baseline's finite data into kernel-checked Lean statements.
+"""Generate Lean proofs of the pinned baseline's finite data bounds.
 
-The hash check authenticates the input bytes relative to the published Git blob.
-The generated Lean proofs validate the finite inequalities independently of Python.
-This does not evaluate the continuous moment integrals.
+The input Git blob hash is checked before transcribing the mathematical tables.
+The generated proofs use kernel-checked arithmetic; this does not check integrals.
 Author: Joshua Wharton, QFEX, joshua@qfex.com
 """
 from __future__ import annotations
-
 import argparse
 import hashlib
 from fractions import Fraction
@@ -74,7 +72,7 @@ def main() -> None:
         "Prepared with ChatGPT. Finite data transcribed from a-kapila/maths-proofs.",
         f"Pinned source commit: {COMMIT}",
         f"Pinned source Git blob: {BLOB}",
-        "The declarations below prove data validity, not continuous integral bounds.",
+        "These proofs establish finite data validity, not continuous integral bounds.",
         "-/",
         "import Mathlib",
         "",
@@ -119,10 +117,6 @@ def main() -> None:
         "  1 ≤ f.kappa ∧ f.kappa ≤ 2 ∧",
         "  (∀ x ∈ f.rCoeffs, |x| ≤ 2) ∧ (∀ x ∈ f.sCoeffs, |x| ≤ 2)",
         "",
-        "instance (f : RawFilter) : Decidable (ValidFilter f) := by",
-        "  unfold ValidFilter",
-        "  infer_instance",
-        "",
         "def ValidCertificate (c : RawCertificate) : Prop :=",
         "  c.multipliers.length = c.comparisons.length +",
         "    (if c.region.val = 0 ∨ c.region.val = 9 then 2 else 3) ∧",
@@ -132,16 +126,14 @@ def main() -> None:
         "  (if c.region.val = 0 then 1 ≤ c.multipliers.headD 0",
         "   else 1 ≤ lowerBoundary c.region * c.multipliers.headD 0)",
         "",
-        "instance (c : RawCertificate) : Decidable (ValidCertificate c) := by",
-        "  unfold ValidCertificate",
-        "  infer_instance",
-        "",
         "theorem filters_count : filters.length = 43 := by decide",
         "theorem certificates_count : certificates.length = 430 := by decide",
         "",
-        "theorem all_filters_valid : ∀ f ∈ filters, ValidFilter f := by decide",
+        "theorem all_filters_valid : ∀ f ∈ filters, ValidFilter f := by",
+        "  norm_num [filters, ValidFilter]",
         "",
-        "theorem all_certificates_valid : ∀ c ∈ certificates, ValidCertificate c := by decide",
+        "theorem all_certificates_valid : ∀ c ∈ certificates, ValidCertificate c := by",
+        "  norm_num [certificates, ValidCertificate, lowerBoundary]",
         "",
         "theorem all_regions_present :",
         "    certificates.map (fun c => (c.filterIndex, c.region)) =",
@@ -151,7 +143,7 @@ def main() -> None:
         "theorem first_multiplier_caps : ∀ c ∈ certificates,",
         "    (c.region.val = 0 → c.multipliers.headD 0 ≤ (17211/1000 : ℚ)) ∧",
         "    (c.region.val = 1 → c.multipliers.headD 0 ≤ (84537/10000 : ℚ)) := by",
-        "  decide",
+        "  norm_num [certificates]",
         "",
         "#print axioms all_filters_valid",
         "#print axioms all_certificates_valid",
