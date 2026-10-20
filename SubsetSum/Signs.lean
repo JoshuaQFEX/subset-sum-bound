@@ -113,6 +113,7 @@ theorem signed_support_card (w : Fin n → ℤ) (F V : Finset (Fin n)) :
     (sumSupport (signedWeights w F) V).card = (sumSupport w V).card := by
   rw [signed_support_translation, Finset.card_image_iff]
   intro x _ y _ he
+  dsimp only at he
   omega
 
 /-- Deficiency is invariant under every choice of sign changes. -/

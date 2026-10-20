@@ -6,10 +6,13 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: finite-filter-data
+  cancel-in-progress: true
 jobs:
   generate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Obtain the exact pinned mathematical data
@@ -30,6 +33,16 @@ jobs:
           set -o pipefail
           lake env lean SubsetSum/FilterData.lean 2>&1 | tee /tmp/filter-data-proof.log
           if grep -E '\b(sorry|admit|axiom|native_decide)\b' SubsetSum/FilterData.lean; then exit 1; fi
+          if grep -F 'sorryAx' /tmp/filter-data-proof.log; then exit 1; fi
+      - name: Preserve finite-data proof and exact log
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: finite-filter-proof
+          path: |
+            SubsetSum/FilterData.lean
+            /tmp/filter-data-proof.log
+          retention-days: 7
       - name: Publish only the checked finite-data source
         run: |
           git config user.name 'github-actions[bot]'
@@ -37,4 +50,5 @@ jobs:
           git add SubsetSum/FilterData.lean
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Add kernel-checked original filter and multiplier data'
+          git pull --rebase origin complete-isolation
           git push origin HEAD:complete-isolation
