@@ -1,0 +1,7 @@
+'SubsetSum.FilterData.all_filters_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.FilterData.all_certificates_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.FilterData.first_multiplier_caps' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.FilterData.all_regions_present' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.FilterData.complete_finite_certificate_data' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.FilterData.invalid_filter_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SubsetSum.FilterData.negative_multiplier_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]

@@ -1,0 +1,79 @@
+✔ [7352/7411] Built SubsetSum.LogBounds (3.9s)
+✔ [7353/7411] Built SubsetSum.Parameters (6.9s)
+✔ [7354/7411] Built SubsetSum.FilterData.Filter42 (7.7s)
+✔ [7355/7411] Built SubsetSum.FilterData.Filter41 (8.2s)
+✔ [7356/7411] Built SubsetSum.FilterData.Filter40 (7.9s)
+✔ [7357/7411] Built SubsetSum.FilterData.Filter39 (7.0s)
+✔ [7358/7411] Built SubsetSum.FilterData.Filter38 (7.9s)
+✔ [7359/7411] Built SubsetSum.FilterData.Filter37 (7.8s)
+✔ [7360/7411] Built SubsetSum.FilterData.Filter36 (7.9s)
+✔ [7361/7411] Built SubsetSum.FilterData.Filter35 (7.9s)
+✔ [7362/7411] Built SubsetSum.FilterData.Filter34 (7.7s)
+✔ [7363/7411] Built SubsetSum.FilterData.Filter33 (7.6s)
+✔ [7364/7411] Built SubsetSum.FilterData.Filter32 (7.5s)
+✔ [7365/7411] Built SubsetSum.FilterData.Filter31 (7.5s)
+✔ [7366/7411] Built SubsetSum.FilterData.Filter29 (7.3s)
+✔ [7367/7411] Built SubsetSum.FilterData.Filter30 (7.6s)
+✔ [7368/7411] Built SubsetSum.FilterData.Filter28 (7.7s)
+✔ [7369/7411] Built SubsetSum.FilterData.Filter25 (7.1s)
+✔ [7370/7411] Built SubsetSum.FilterData.Filter27 (7.9s)
+✔ [7371/7411] Built SubsetSum.FilterData.Filter26 (7.5s)
+✔ [7372/7411] Built SubsetSum.FilterData.Filter24 (7.7s)
+✔ [7373/7411] Built SubsetSum.FilterData.Filter23 (7.2s)
+✔ [7374/7411] Built SubsetSum.FilterData.Filter21 (6.0s)
+✔ [7375/7411] Built SubsetSum.FilterData.Filter22 (7.4s)
+✔ [7376/7411] Built SubsetSum.FilterData.Filter20 (7.5s)
+✔ [7377/7411] Built SubsetSum.FilterData.Filter17 (7.2s)
+✔ [7378/7411] Built SubsetSum.FilterData.Filter18 (7.6s)
+✔ [7379/7411] Built SubsetSum.FilterData.Filter19 (7.9s)
+✔ [7380/7411] Built SubsetSum.FilterData.Filter16 (7.8s)
+✔ [7381/7411] Built SubsetSum.FilterData.Filter14 (7.4s)
+✔ [7382/7411] Built SubsetSum.FilterData.Filter13 (7.2s)
+✔ [7383/7411] Built SubsetSum.FilterData.Filter15 (7.5s)
+✔ [7384/7411] Built SubsetSum.FilterData.Filter12 (7.5s)
+✔ [7385/7411] Built SubsetSum.FilterData.Filter10 (7.0s)
+✔ [7386/7411] Built SubsetSum.FilterData.Filter11 (7.3s)
+✔ [7387/7411] Built SubsetSum.FilterData.Filter09 (7.7s)
+✔ [7388/7411] Built SubsetSum.FilterData.Filter08 (6.0s)
+✔ [7389/7411] Built SubsetSum.FilterData.Filter06 (6.6s)
+✔ [7393/7411] Built SubsetSum.FilterData.Filter07 (7.3s)
+✔ [7394/7411] Built SubsetSum.FilterData.Filter05 (7.4s)
+✔ [7395/7411] Built SubsetSum.FilterData.Filter04 (6.8s)
+✔ [7396/7411] Built SubsetSum.FilterData.Filter03 (6.8s)
+⚠ [7397/7411] Built SubsetSum.CertificateTransfer (9.8s)
+warning: SubsetSum/CertificateTransfer.lean:90:5: unused variable `hk0`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [7398/7411] Built SubsetSum.FilterData (10s)
+✔ [7399/7411] Built SubsetSum.Asymptotics (9.0s)
+✔ [7400/7411] Built SubsetSum.Decision (10s)
+✔ [7401/7411] Built SubsetSum.Numerics (23s)
+⚠ [7402/7411] Built SubsetSum.Support (7.4s)
+warning: SubsetSum/Support.lean:149:72: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+warning: SubsetSum/Support.lean:149:72: 'tauto' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+✔ [7403/7411] Built SubsetSum.Isolation (10s)
+⚠ [7404/7411] Built SubsetSum.Refinement (7.8s)
+warning: SubsetSum/Refinement.lean:94:40: unused variable `hz0`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [7405/7411] Built SubsetSum.Signs (5.3s)
+✔ [7406/7411] Built SubsetSum.Transformation (5.5s)
+⚠ [7407/7411] Built SubsetSum.Layers (12s)
+warning: SubsetSum/Layers.lean:154:24: This simp argument is unused:
+  Nat.mul_comm
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵N̵a̵t̵.̵m̵u̵l̵_̵c̵o̵m̵m̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [7408/7411] Built SubsetSum.Sampling (5.9s)
+warning: SubsetSum/Sampling.lean:100:19: unused variable `hav`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [7409/7411] Built SubsetSum.SmallLayer (8.6s)
+✔ [7410/7411] Built SubsetSum (3.2s)
+Build completed successfully (7411 jobs).
