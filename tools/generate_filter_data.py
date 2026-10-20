@@ -108,57 +108,71 @@ def main() -> None:
 
     imports = ['SubsetSum.FilterData.Base']
     filter_names = [f'filter_{v}' for v in range(43)]
+    certificate_lists = []
+
     for v in range(43):
         mod = f'Filter{v:02d}'
-        imports.append(f'SubsetSum.FilterData.{mod}')
-        lines = [
-            '/-', f'Author: Joshua Wharton, QFEX, joshua@qfex.com',
-            f'Finite data for filter {v}; each proposition is checked by Lean.',
-            f'Extracted from pinned source commit {COMMIT}.', '-/',
-            'import SubsetSum.FilterData.Base', '',
-            'set_option autoImplicit false', 'set_option maxHeartbeats 2000000',
-            'set_option maxRecDepth 100000', '',
-            'namespace SubsetSum.FilterData', ''
-        ]
+        cert_modules = []
+        cert_names = []
         k, rc, sc = filters[v]
-        lines += [
-            f'def filter_{v} : RawFilter := ⟨{rat(k)}, {rats(rc)}, {rats(sc)}⟩',
-            f'theorem filter_{v}_valid : ValidFilter filter_{v} := by',
-            f'  norm_num [filter_{v}, ValidFilter]', ''
-        ]
         for r in range(10):
+            cert_mod = f'Certificate{v:02d}_{r:02d}'
+            cert_modules.append(f'SubsetSum.FilterData.{cert_mod}')
             comps, zs = certs[(v, r)]
             key = f'certificate_{v}_{r}'
             cs = '[' + ', '.join(str(j) for j in comps) + ']'
-            lines += [
+            cert_lines = [
+                '/-', f'Author: Joshua Wharton, QFEX, joshua@qfex.com',
+                f'Certificate ({v}, {r}); each arithmetic proposition is checked by Lean.',
+                f'Extracted from pinned source commit {COMMIT}.', '-/',
+                'import SubsetSum.FilterData.Base', '',
+                'set_option autoImplicit false', 'set_option maxHeartbeats 2000000',
+                'set_option maxRecDepth 100000', '',
+                'namespace SubsetSum.FilterData', '',
                 f'def {key} : RawCertificate := ⟨{v}, {r}, {cs}, {rats(zs)}⟩',
                 f'theorem {key}_valid : ValidCertificate {key} := by',
                 f'  norm_num [{key}, ValidCertificate, lowerBoundary, Fin.ext_iff]',
                 f'theorem {key}_cap : FirstCap {key} := by',
-                f'  norm_num [{key}, FirstCap]', ''
+                f'  norm_num [{key}, FirstCap]', '',
+                'end SubsetSum.FilterData', ''
             ]
-        names = [f'certificate_{v}_{r}' for r in range(10)]
-        lines += [
-            f'def filter_{v}_certificates : List RawCertificate := [' + ', '.join(names) + ']',
+            (outdir / f'{cert_mod}.lean').write_text('\n'.join(cert_lines), encoding='utf-8')
+            cert_names.append(key)
+
+        imports.extend(cert_modules)
+        imports.append(f'SubsetSum.FilterData.{mod}')
+        filter_lines = [
+            '/-', f'Author: Joshua Wharton, QFEX, joshua@qfex.com',
+            f'Filter {v} with its ten separately checked certificate modules.',
+            f'Extracted from pinned source commit {COMMIT}.', '-/',
+            'import SubsetSum.FilterData.Base',
+            *[f'import {name}' for name in cert_modules], '',
+            'set_option autoImplicit false', 'set_option maxHeartbeats 2000000',
+            'set_option maxRecDepth 100000', '',
+            'namespace SubsetSum.FilterData', '',
+            f'def filter_{v} : RawFilter := ⟨{rat(k)}, {rats(rc)}, {rats(sc)}⟩',
+            f'theorem filter_{v}_valid : ValidFilter filter_{v} := by',
+            f'  norm_num [filter_{v}, ValidFilter]', '',
+            f'def filter_{v}_certificates : List RawCertificate := [' +
+                ', '.join(cert_names) + ']',
             f'theorem filter_{v}_certificates_count : filter_{v}_certificates.length = 10 := by',
             '  rfl', '',
             'end SubsetSum.FilterData', ''
         ]
-        (outdir / f'{mod}.lean').write_text('\n'.join(lines), encoding='utf-8')
+        (outdir / f'{mod}.lean').write_text('\n'.join(filter_lines), encoding='utf-8')
+        certificate_lists.append(f'filter_{v}_certificates')
 
     aggregator = [
         '/-', 'Author: Joshua Wharton, QFEX, joshua@qfex.com',
-        'Generated aggregator. Each filter/certificate is proved in a small module.',
-        'All modules are imported so the standalone Lean command kernel-checks them.', '-/',
+        'Generated aggregator. Every certificate has its own small Lean module.', '-/',
         *[f'import {name}' for name in imports], '',
         'namespace SubsetSum.FilterData', '',
         'def filters : List RawFilter := [' + ', '.join(filter_names) + ']',
         'def certificates : List RawCertificate := ' +
-        ' ++ '.join(f'filter_{v}_certificates' for v in range(43)),
+            ' ++ '.join(certificate_lists),
         '',
         'theorem filters_count : filters.length = 43 := by',
         '  rfl', '',
-
         'end SubsetSum.FilterData', ''
     ]
     args.output.write_text('\n'.join(aggregator), encoding='utf-8')
