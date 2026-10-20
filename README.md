@@ -1,5 +1,8 @@
 # Subset Sum bound
 
+**Author:** Joshua Wharton, QFEX  
+**Email:** [joshua@qfex.com](mailto:joshua@qfex.com)
+
 A **conditional refinement to `O(2^(0.487676 n))`** of the claimed
 `O(2^(0.4877 n))` construction in `a-kapila/maths-proofs`.
 
@@ -11,7 +14,8 @@ speedup claim.
 
 ## Paper
 
-[LaTeX source](paper.tex). Compile it with `make pdf` to produce `paper.pdf`.
+[Read the paper (PDF)](paper.pdf) | [LaTeX source](paper.tex).
+Rebuild the PDF locally with `make pdf`.
 The paper includes the conditional theorem, exact parameters, alias
 constraints, the certificate-transfer lemma, the error analysis and
 pinned references. The internal work exponent is `0.48767595`; the final
@@ -57,8 +61,9 @@ pdflatex -interaction=nonstopmode -halt-on-error -no-shell-escape paper.tex
 pdflatex -interaction=nonstopmode -halt-on-error -no-shell-escape paper.tex
 ```
 
-PDFs and intermediate LaTeX files are generated locally and ignored by Git.
-`make clean` removes the generated paper files.
+The compiled [paper.pdf](paper.pdf) is included in the repository. Intermediate
+LaTeX files remain ignored by Git. `make clean` removes local build outputs;
+run `make pdf` afterwards to regenerate the PDF.
 
 ## Pinned dependencies
 
