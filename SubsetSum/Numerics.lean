@@ -35,7 +35,7 @@ theorem log_two_bounds :
     (by norm_num)
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
-  norm_num at h
+  norm_num at h ⊢
   exact h
 
 private lemma log_yA :
@@ -45,7 +45,7 @@ private lemma log_yA :
     (by norm_num)
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
-  norm_num at h
+  norm_num at h ⊢
   exact h
 
 private lemma log_yB :
@@ -55,7 +55,7 @@ private lemma log_yB :
     (by norm_num)
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
-  norm_num at h
+  norm_num at h ⊢
   exact h
 
 private lemma log_yC :
@@ -65,7 +65,7 @@ private lemma log_yC :
     (by norm_num)
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
-  norm_num at h
+  norm_num at h ⊢
   exact h
 
 private lemma log_yD :
@@ -75,7 +75,7 @@ private lemma log_yD :
     (by norm_num)
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
     (by norm_num [realLogTaylor, Finset.sum_range_succ])
-  norm_num at h
+  norm_num at h ⊢
   exact h
 
 private lemma log_scale (x : ℝ) (m : ℕ) (hx : 0 < x) :
@@ -188,7 +188,7 @@ private theorem log_three_ratio_le_two : Real.log 3 / Real.log 2 ≤ (2 : ℝ) :
   norm_num at h
   exact (div_le_iff₀ hp).2 h
 
-/-- All alias conditions, with a common strict margin of 10^(-8). -/
+/-- All alias conditions; the five tight conditions retain a strict margin of 10^(-8). -/
 theorem alias_constraints :
     gamma + 0.00000001 < entropy (2 * mask) / 2 ∧
     left + (entropy mask - gamma) * block + 0.00000001 < tau ∧
@@ -207,7 +207,8 @@ theorem alias_constraints :
   have hc := entropy_half_sub_a_bounds
   have hd := log_three_ratio_le_two
   norm_num [gamma, left, right, block, tau, eta, mask] at *
-  repeat' constructor <;> linarith [ha.1, ha.2, hb.1, hb.2, hc.1, hc.2]
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
+    linarith [ha.1, ha.2, hb.1, hb.2, hc.1, hc.2]
 
 end
 end SubsetSum

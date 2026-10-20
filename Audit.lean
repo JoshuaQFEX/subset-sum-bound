@@ -11,3 +11,10 @@ import SubsetSum
 #print axioms SubsetSum.real_log_taylor_bound
 #print axioms SubsetSum.alias_constraints
 #print axioms SubsetSum.concrete_refined_bound
+#print axioms SubsetSum.alias_subtraction
+#print axioms SubsetSum.isolated_solution_sum
+#print axioms SubsetSum.zero_rejected
+#print axioms SubsetSum.unit_detected
+#print axioms SubsetSum.regional_moment_transfer
+#print axioms SubsetSum.low_moment_refinement
+#print axioms SubsetSum.bounded_moment_identity

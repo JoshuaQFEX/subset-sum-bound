@@ -51,7 +51,7 @@ theorem low_domination {D q0 alpha U z : ℝ}
   have hbudget : D ≤ alpha * (D / q0) := by
     calc D = q0 * (D / q0) := by field_simp
          _ ≤ alpha * (D / q0) := mul_le_mul_of_nonneg_right ha hDq
-  have hu : U < D / q0 := (mul_lt_mul_left hap).mp (hs.trans_le hbudget)
+  have hu : U < D / q0 := (mul_lt_mul_iff_right₀ hap).mp (hs.trans_le hbudget)
   have hprod := mul_nonneg (sub_nonneg.mpr (ha1.trans hz))
     (sub_nonneg.mpr hu.le)
   nlinarith
@@ -59,7 +59,7 @@ theorem low_domination {D q0 alpha U z : ℝ}
 theorem band_domination {D A W U alpha z : ℝ} (ha : 0 < alpha)
     (haz : alpha ≤ z) (hbudget : alpha * (A * W) = D)
     (hs : alpha * U < D) : -alpha * U ≤ -D + z * (A * W - U) := by
-  have hu : U < A * W := (mul_lt_mul_left ha).mp (by rw [hbudget]; exact hs)
+  have hu : U < A * W := (mul_lt_mul_iff_right₀ ha).mp (by rw [hbudget]; exact hs)
   have hp := mul_nonneg (sub_nonneg.mpr haz) (sub_nonneg.mpr hu.le)
   nlinarith [hbudget]
 
@@ -94,7 +94,8 @@ theorem coarse_score_bound {k B L H : ℝ}
   calc
     |(2 - k) * B - 2 * L + H| ≤ |(2 - k) * B - 2 * L| + |H| := abs_add_le _ _
     _ ≤ |(2 - k) * B| + |2 * L| + |H| :=
-      add_le_add_right (abs_sub_le ((2 - k) * B) (2 * L)) |H|
+      add_le_add_right
+        (by simpa only [Real.norm_eq_abs] using (norm_sub_le ((2 - k) * B) (2 * L))) |H|
     _ = (2 - k) * |B| + 2 * |L| + |H| := by
       rw [abs_mul, abs_mul, abs_of_nonneg hk]
       norm_num
