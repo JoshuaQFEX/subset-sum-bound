@@ -14,7 +14,7 @@ Note: This linter can be disabled with `set_option linter.unreachableTactic fals
 warning: SubsetSum/Support.lean:149:72: 'tauto' tactic does nothing
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
-⚠ [7362/7364] Built SubsetSum.Layers (10s)
+⚠ [7362/7364] Replayed SubsetSum.Layers
 warning: SubsetSum/Layers.lean:154:24: This simp argument is unused:
   Nat.mul_comm
 
@@ -22,7 +22,6 @@ Hint: Omit it from the simp argument list.
   simp ̵[̵N̵a̵t̵.̵m̵u̵l̵_̵c̵o̵m̵m̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [7363/7364] Built SubsetSum (3.3s)
 Build completed successfully (7364 jobs).
 
 $ lake env lean Scratch.lean
