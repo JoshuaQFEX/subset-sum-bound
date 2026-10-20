@@ -1,0 +1,11 @@
+{
+  "source_sha": "3a26b226efbf8d27968db5deb030bd7e8a686b53",
+  "build_exit": 0,
+  "scratch_exit": 0,
+  "audit_exit": 0,
+  "gap_files": [],
+  "success": true,
+  "checked_at": "2026-10-20T13:27:28.384953+00:00",
+  "run_id": "39430161880",
+  "log_truncated": false
+}
