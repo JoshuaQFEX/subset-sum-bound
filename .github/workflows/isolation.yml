@@ -1,0 +1,35 @@
+name: Isolation proof
+on:
+  push:
+    branches: [complete-isolation]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install pinned Lean toolchain
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch pinned mathlib
+        run: |
+          lake update
+          lake exe cache get
+      - name: Check all proofs and isolation dependencies
+        run: |
+          set -o pipefail
+          lake build 2>&1 | tee /tmp/lean-build.log
+          printf 'import SubsetSum\n#print axioms SubsetSum.Isolation.isolation_count\n#print axioms SubsetSum.Isolation.isolation_eleven_twelfths\n' > /tmp/IsolationAudit.lean
+          lake env lean /tmp/IsolationAudit.lean
+          lake env lean Audit.lean
+          python3 verify.py
+      - name: Reject unfinished proof declarations
+        run: |
+          if grep -R -nE '\b(sorry|admit|axiom|native_decide)\b' --include='*.lean' SubsetSum SubsetSum.lean Audit.lean; then
+            exit 1
+          fi

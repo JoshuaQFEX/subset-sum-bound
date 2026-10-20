@@ -5,3 +5,4 @@ import SubsetSum.Numerics
 import SubsetSum.Asymptotics
 import SubsetSum.Decision
 import SubsetSum.Refinement
+import SubsetSum.Isolation
