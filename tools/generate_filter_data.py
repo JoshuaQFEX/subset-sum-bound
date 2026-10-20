@@ -26,13 +26,6 @@ def rats(value: str) -> str:
     return '[' + ', '.join(rat(s) for s in value.split(',')) + ']'
 
 
-def list_forall(theorem_names: list[str]) -> str:
-    tail = 'List.Forall.nil'
-    for name in reversed(theorem_names):
-        tail = f'List.Forall.cons {name} ({tail})'
-    return tail
-
-
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
@@ -133,8 +126,6 @@ def main() -> None:
             f'theorem filter_{v}_valid : ValidFilter filter_{v} := by',
             f'  norm_num [filter_{v}, ValidFilter]', ''
         ]
-        local_cert_names: list[str] = []
-        local_cap_names: list[str] = []
         for r in range(10):
             comps, zs = certs[(v, r)]
             key = f'certificate_{v}_{r}'
@@ -146,15 +137,11 @@ def main() -> None:
                 f'theorem {key}_cap : FirstCap {key} := by',
                 f'  norm_num [{key}, FirstCap]', ''
             ]
-            local_cert_names.append(f'{key}_valid')
-            local_cap_names.append(f'{key}_cap')
         names = [f'certificate_{v}_{r}' for r in range(10)]
         lines += [
             f'def filter_{v}_certificates : List RawCertificate := [' + ', '.join(names) + ']',
-            f'theorem filter_{v}_certificates_valid : List.Forall ValidCertificate filter_{v}_certificates := by',
-            '  exact ' + list_forall(local_cert_names), '',
-            f'theorem filter_{v}_first_caps : List.Forall FirstCap filter_{v}_certificates := by',
-            '  exact ' + list_forall(local_cap_names), '',
+            f'theorem filter_{v}_certificates_count : filter_{v}_certificates.length = 10 := by',
+            '  rfl', '',
             'end SubsetSum.FilterData', ''
         ]
         (outdir / f'{mod}.lean').write_text('\n'.join(lines), encoding='utf-8')
@@ -171,18 +158,7 @@ def main() -> None:
         '',
         'theorem filters_count : filters.length = 43 := by',
         '  rfl', '',
-        'theorem certificates_count : certificates.length = 430 := by',
-        '  simp [certificates, filter_0_certificates, filter_1_certificates, filter_2_certificates,',
-        '    filter_3_certificates, filter_4_certificates, filter_5_certificates, filter_6_certificates,',
-        '    filter_7_certificates, filter_8_certificates, filter_9_certificates, filter_10_certificates,',
-        '    filter_11_certificates, filter_12_certificates, filter_13_certificates, filter_14_certificates,',
-        '    filter_15_certificates, filter_16_certificates, filter_17_certificates, filter_18_certificates,',
-        '    filter_19_certificates, filter_20_certificates, filter_21_certificates, filter_22_certificates,',
-        '    filter_23_certificates, filter_24_certificates, filter_25_certificates, filter_26_certificates,',
-        '    filter_27_certificates, filter_28_certificates, filter_29_certificates, filter_30_certificates,',
-        '    filter_31_certificates, filter_32_certificates, filter_33_certificates, filter_34_certificates,',
-        '    filter_35_certificates, filter_36_certificates, filter_37_certificates, filter_38_certificates,',
-        '    filter_39_certificates, filter_40_certificates, filter_41_certificates, filter_42_certificates]', '',
+
         'end SubsetSum.FilterData', ''
     ]
     args.output.write_text('\n'.join(aggregator), encoding='utf-8')
