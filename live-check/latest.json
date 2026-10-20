@@ -1,11 +1,11 @@
 {
-  "source_sha": "1c4f19043bbd8521689cff350014e59d1e4b1363",
-  "build_exit": 1,
+  "source_sha": "edf3d915badb5246915ca779490f9a1b777d4880",
+  "build_exit": 0,
   "scratch_exit": 0,
-  "audit_exit": 1,
+  "audit_exit": 0,
   "gap_files": [],
-  "success": false,
-  "checked_at": "2026-10-20T13:38:49.674739+00:00",
+  "success": true,
+  "checked_at": "2026-10-20T13:42:55.004667+00:00",
   "run_id": "39430161880",
   "log_truncated": false
 }
