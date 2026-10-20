@@ -2,7 +2,7 @@ name: Verify finite filter data
 on:
   push:
     branches: [complete-isolation]
-    paths: ['tools/generate_filter_data.py', '.github/workflows/filter-data.yml']
+    paths: ['tools/generate_filter_data.py', '.github/workflows/filter-data.yml', 'FiniteDataAudit.lean']
   workflow_dispatch:
 permissions:
   contents: write
@@ -12,30 +12,71 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - name: Obtain the exact pinned mathematical data
+      - name: Authenticate source and generate exact finite statements
         run: |
+          set -euo pipefail
           curl --retry 3 -fsSL https://raw.githubusercontent.com/a-kapila/maths-proofs/44c34961b56784c220a6e913cc068d57dc37c5a3/subset-sum/PROOF_0.4877.tex -o /tmp/baseline.tex
           python3 tools/generate_filter_data.py /tmp/baseline.tex SubsetSum/FilterData.lean
-      - name: Install the pinned toolchain
+      - name: Install pinned Lean toolchain
         run: |
           curl --retry 3 -fsSL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
           sh /tmp/elan-init.sh -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Fetch checked libraries
+      - name: Fetch pinned mathematical libraries
         run: |
-          lake update || lake update
+          lake update
           lake exe cache get
-      - name: Kernel-check the generated finite statements
+      - name: Check formerly failing filters first
         run: |
-          set -o pipefail
-          lake build 2>&1 | tee /tmp/filter-data-proof.log
-          lake env lean SubsetSum/FilterData.lean 2>&1 | tee -a /tmp/filter-data-proof.log
-          if grep -E '\b(sorry|admit|axiom|native_decide)\b' SubsetSum/FilterData.lean; then exit 1; fi
-          if grep -F 'sorryAx' /tmp/filter-data-proof.log; then exit 1; fi
-      - name: Preserve finite-data proof and exact log
+          set -euo pipefail
+          mkdir -p verification
+          lake build SubsetSum.FilterData.Filter00 SubsetSum.FilterData.Filter01 SubsetSum.FilterData.Filter02 2>&1 | tee verification/finite-data-smoke.txt
+      - name: Kernel-check the whole project and dependency audits
+        run: |
+          set -euo pipefail
+          lake build 2>&1 | tee verification/finite-data-build.txt
+          lake env lean FiniteDataAudit.lean 2>&1 | tee verification/finite-data-axioms.txt
+          lake env lean Audit.lean 2>&1 | tee verification/core-axioms.txt
+          python3 verify.py | tee verification/numeric-check.txt
+      - name: Check trust boundary and record the exact successful revision
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, re
+          from datetime import datetime, timezone
+          from pathlib import Path
+          sources = [Path('SubsetSum.lean'), Path('Audit.lean'), Path('FiniteDataAudit.lean'), *Path('SubsetSum').rglob('*.lean')]
+          forbidden = re.compile(r'\b(sorry|admit|axiom|native_decide)\b|decide\s*\+native|\[\s*implemented_by')
+          bad = [str(p) for p in sources if forbidden.search(p.read_text())]
+          if bad:
+              raise SystemExit('Forbidden proof shortcut: ' + ', '.join(bad))
+          audit = Path('verification/finite-data-axioms.txt').read_text()
+          names = ['all_filters_valid', 'all_certificates_valid', 'first_multiplier_caps', 'all_regions_present', 'complete_finite_certificate_data', 'invalid_filter_rejected', 'negative_multiplier_rejected']
+          allowed = {'propext', 'Classical.choice', 'Quot.sound'}
+          for name in names:
+              full = 'SubsetSum.FilterData.' + name
+              match = re.search(re.escape(full) + r"' depends on axioms:\s*\[([^\]]*)\]", audit)
+              independent = ("'" + full + "' does not depend on any axioms") in audit
+              if not match and not independent:
+                  raise SystemExit('Missing dependency audit for ' + full)
+              if match:
+                  found = {x.strip() for x in match.group(1).split(',') if x.strip()}
+                  if found - allowed:
+                      raise SystemExit('Unapproved dependencies for ' + full + ': ' + str(found))
+          generated = [Path('SubsetSum/FilterData.lean'), *sorted(Path('SubsetSum/FilterData').glob('*.lean'))]
+          assert len(generated) == 45, len(generated)
+          report = {'success': True, 'checked_source_sha': os.environ['GITHUB_SHA'],
+                    'run_id': os.environ['GITHUB_RUN_ID'], 'checked_at': datetime.now(timezone.utc).isoformat(),
+                    'lean': 'leanprover/lean4:v4.24.0', 'mathlib_revision': 'f897ebcf72cd16f89ab4577d0c826cd14afaafc7',
+                    'filters': 43, 'certificates': 430, 'arithmetic_proof': 'decide +kernel',
+                    'scope': 'Finite rational coefficient and multiplier data, complete record coverage; not continuous moment integrals or the full algorithm.',
+                    'generated_sha256': {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in generated}}
+          Path('verification/finite-data.json').write_text(json.dumps(report, indent=2) + '\n')
+          print('PASS: complete finite data, full project build, dependency audits and numeric cross-check.')
+          PY
+      - name: Preserve source and diagnostic evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -43,14 +84,17 @@ jobs:
           path: |
             SubsetSum/FilterData.lean
             SubsetSum/FilterData/*.lean
-            /tmp/filter-data-proof.log
+            FiniteDataAudit.lean
+            verification/
           retention-days: 7
-      - name: Publish only the checked finite-data source
+      - name: Publish only the verified sources and results
         run: |
+          set -euo pipefail
+          current=$(git ls-remote origin refs/heads/complete-isolation | cut -f1)
+          test "$current" = "$GITHUB_SHA"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add SubsetSum/FilterData.lean SubsetSum/FilterData/*.lean
+          git add -A SubsetSum/FilterData SubsetSum/FilterData.lean verification
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Add kernel-checked original filter and multiplier data'
-          git pull --rebase origin complete-isolation
+          git commit -m 'Publish kernel-checked complete finite certificate data and verification record'
           git push origin HEAD:complete-isolation
