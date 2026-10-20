@@ -2,146 +2,86 @@
 
 **Author:** Joshua Wharton, QFEX  
 **Email:** joshua@qfex.com  
-Prepared with ChatGPT, 20 October 2026.
+Prepared with ChatGPT. Updated 20 October 2026.
 
-## What this development establishes
+## Current status
 
-This is a Lean 4 formalisation of substantial components of the conditional
-Subset Sum refinement. It is **not an end-to-end formal proof of a Subset Sum
-solver running in `O(2^(0.487676 n))`**. In particular, no theorem here asserts
-that a concrete implementation has that runtime.
+The project contains compiled Lean proofs of substantial parts of the conditional Subset Sum refinement. The [complete finite-data milestone](FINITE_DATA_MILESTONE.md) now verifies all 43 filters, all 430 certificate records and exact filter/region coverage. The full development passed [workflow run 39487903482](https://github.com/JoshuaQFEX/subset-sum-bound/actions/runs/39487903482).
 
-The distinction between a theorem's hypotheses and its conclusion is part of
-the public interface. Original moment bounds appear as hypotheses such as
-`hbase`; they are not silently asserted as new global axioms.
+This is **not yet an end-to-end formal proof of a Subset Sum solver running in `O(2^(0.487676 n))`**. The original continuous moment bounds remain explicit hypotheses of the integral-transfer theorems. No theorem asserts the claimed operation count for a complete concrete implementation.
 
 ## Proof map
 
-| Module | Formal content | Main declarations |
-|---|---|---|
-| `SubsetSum/Parameters.lean` | Exact real rational parameters; transferred scalar margins; multiplier, error and exponent budgets | `certified_margins`, `multiplier_sum_budget`, `error_exponent`, `pure_exponent_gap` |
-| `SubsetSum/LogBounds.lean` | Real-logarithm Taylor approximation with a proved analytic remainder, obtained from mathlib's complex-log theorem | `real_log_taylor_bound`, `log_interval` |
-| `SubsetSum/Numerics.lean` | Rational logarithm enclosures, actual binary-entropy bounds, all alias inequalities and auxiliary size inequalities | `log_two_bounds`, `entropy_a_bounds`, `entropy_two_a_bounds`, `entropy_half_sub_a_bounds`, `alias_constraints` |
-| `SubsetSum/CertificateTransfer.lean` | Sampling-fraction bounds, low/band domination, exact exponent shifts, tail estimate, and genuine measure-integral transfer | `sampling_low_bounds`, `low_domination`, `band_domination`, `band_shift`, `moment_shift`, `transferred_moment` |
-| `SubsetSum/Asymptotics.lean` | Absorption of sublinear additive exponent overhead, including `C*n^0.7 + K*log n` | `exp2_absorption`, `concrete_refined_bound` |
-| `SubsetSum/Decision.lean` | Finite-subset definitions, exact alias cancellation, isolated-witness sum, and deterministic decision/error thresholds | `alias_subtraction`, `isolated_solution_sum`, `zero_rejected`, `unit_detected`, `subtraction_error` |
-| `SubsetSum/Refinement.lean` | Application of the numerical budgets to conditional moment bounds, including the concrete low region and the exact bounded-band identity | `regional_moment_transfer`, `low_moment_refinement`, `bounded_moment_identity` |
+| Module | Formal content |
+|---|---|
+| `Parameters.lean` | Exact rational parameters, transferred scalar margins and error/exponent budgets. |
+| `LogBounds.lean` | Real-logarithm Taylor approximation with an analytic remainder, obtained from mathlib's complex-log theorem. |
+| `Numerics.lean` | Rational enclosures of actual real logarithms and binary entropy; all stated alias side inequalities. |
+| `CertificateTransfer.lean` | Sampling-fraction bounds, low/band domination, exponent shifts, tail estimate and measure-integral transfer. |
+| `Asymptotics.lean` | Absorption of sublinear additive exponent overhead, including `C*n^0.7 + K*log n`. |
+| `Decision.lean` | Actual finite-subset definitions, alias cancellation, isolated-witness sums and deterministic error thresholds. |
+| `Refinement.lean` | Concrete numerical budgets applied to conditional moment inequalities. |
+| `Isolation.lean` | Finite counting proof of the isolation lemma and its uniform success fraction. |
+| `Transformation.lean` | Exact integer-field separation, preservation of solvability and the transformed isolation probability. |
+| `Support.lean` | Finite subset-sum supports and their logarithmic deficiencies. |
+| `Signs.lean` | Signed-weight and symmetric-difference identities. |
+| `Layers.lean` | Finite layer-support counting. |
+| `Sampling.lean` | Finite sample averages and their combinatorial identities. |
+| `SmallLayer.lean` | Averaged small-layer inequality using actual supports and exponential deficiencies. |
+| `FilterData.lean` and `FilterData/` | All 43 concrete filters, 430 concrete finite certificates, their bounds, exact coverage and a closed aggregate theorem. |
 
-All modules are imported by `SubsetSum.lean`. The files retain the author's
-name, affiliation and contact details in their headers.
+All modules are imported by `SubsetSum.lean`. The full build checks these sources, not just the finite-data smoke-test targets.
 
-### Logarithms and the alias inequalities
+## Numerical and finite-data results
 
-`entropy` is defined using `Real.log`; it is not an uninterpreted function
-whose numerical values are supplied as hypotheses. The proof derives rational
-intervals from the analytic Taylor theorem and range reduction. Proof-producing
-`norm_num` and linear arithmetic check the rational consequences.
+`entropy` is defined using `Real.log`. The proof derives rational intervals from the Taylor theorem and range reduction. The five tight alias inequalities are proved with a strict additional margin of `10^(-8)`; auxiliary conditions are also proved strictly. No Python output is assumed by these propositions.
 
-The five tight alias inequalities are proved with an additional strict margin
-of `10^(-8)`. The remaining alias and auxiliary conditions are proved strictly.
-The Lean result deliberately uses a more conservative margin than the sharper
-interval reported by the separate Python checker. The guard loss is smaller
-than `10^(-8)` as well.
+The finite-data predicates in `FilterData/Base.lean` express coefficient lengths/bounds, the power-parameter range, multiplier-vector lengths, nonnegative multipliers, the sum budget, comparison-index exclusions and region-specific first-multiplier conditions. Every concrete record is proved using `decide +kernel`. Aggregate proofs reuse the individual results.
 
-No Python output, floating-point estimate or external oracle is used as a proof
-of these Lean propositions.
+`FilterData.complete_finite_certificate_data` is a closed theorem: it has no input assumptions about the numerical data. It includes equality with the complete expected sequence of filter/region pairs, not just a total of 430 rows. Two negative regression tests prove that malformed filter data and negative multiplier data fail the predicates.
 
-### Certificate transfer
+See [the milestone record](FINITE_DATA_MILESTONE.md) for the exact statement, provenance and successful audit. These finite bounds are now established in Lean; the original continuous moment inequalities are not.
 
-`moment` is an actual Bochner integral over a measure space, with the
-nonnegative weight and integrability requirements stated in the relevant
-inequality theorems. `exp2 x` is proved equal to `(2 : Real)^x`.
+## Integral-transfer boundary
 
-The low-region domination includes the interval between the new and old
-boundaries; it does not incorrectly assume that the sampling fraction is one
-throughout the old low region. The bounded-region multiplier adjustment is
-proved to cancel the variable-dependent exponent change. The tail transfer is
-controlled by a pointwise score bound.
+`moment` is an actual Bochner integral. Nonnegative weights and integrability requirements are stated in the relevant inequalities. `exp2 x` is proved equal to `(2 : Real)^x`.
 
-The theorem `coarse_score_bound` proves the final estimate `|w| <= 256` from the
-listed bounds on its component scores. The earlier derivation of those bounds
-from the 43 specific trigonometric filters is not instantiated in Lean here.
-Likewise, the generic transfer theorems do not themselves prove the original
-430 moment inequalities or the transcribed limits on their multipliers.
+The low-region argument includes the interval between the new and old boundaries. The bounded-region multiplier adjustment cancels the variable-dependent change. The tail argument is controlled by a pointwise score bound.
 
-### Asymptotic conclusion
+`coarse_score_bound` proves the final bound `|w| <= 256` from bounds on component scores. Deriving all those component-score bounds from the concrete trigonometric functions and normalising integrals remains a separate task. Proving coefficient bounds does not itself prove those analytic estimates.
 
-For arbitrary real constants `C` and `K`, `concrete_refined_bound` proves
+The generic moment-transfer theorems still require the old moment inequalities, such as `hbase`. Their successful compilation proves the stated implications, not the hypotheses supplied to them.
 
-```
+## Asymptotic and algorithmic boundary
+
+For arbitrary real constants `C` and `K`, `concrete_refined_bound` proves the asymptotic growth statement
+
+```text
 2 ^ ((tau + 20*epsilon)*n + C*n^0.7 + K*log n)
     = O(2 ^ (targetExponent*n))
 ```
 
-as natural `n` tends to infinity, with the exact constants
-`tau = 0.48767595`, `epsilon = 10^(-11)`, and
-`targetExponent = 0.487676`.
+with `tau = 0.48767595`, `epsilon = 10^(-11)` and `targetExponent = 0.487676`. A proof that a program's operation count is bounded by the left-hand expression remains necessary.
 
-This is a growth theorem for real-valued functions. Applying it to a program
-still requires a proof that the program's operation count satisfies the
-appropriate bound. That runtime premise has not been formalised here.
+The decision identities use actual subsets of `Fin n` and integer weights. Isolation and the integer transformation are now formalised rather than merely cited. This does not establish that the implemented checksum and alias procedures achieve their required error, coverage and runtime bounds.
 
-### Decision identities
+Remaining work includes the filter-specific continuous integrals and quadrature error certificates, finite-circle convergence applied to the concrete filters, checksum tables and estimator guarantees, the remaining alias coverage/resource arguments, and the capped word-RAM implementation with an every-execution cost bound. Some supporting combinatorial lemmas are already present, but the complete algorithms are not assembled and proved.
 
-The decision module defines sums over **actual subsets of `Fin n`**, with
-integer weights. It proves that the modular phase sum minus the non-exact
-alias sum is the exact target phase sum. A unique witness reduces the sum to
-its phase. The threshold lemmas prove rejection of zero and detection of a
-unit-norm sum under an absolute error at most `1/4`.
+## Reproduction and trust boundary
 
-These are deterministic identities. They do not assert that random isolation
-succeeds or that the implemented checksum estimator attains the required
-accuracy with the paper's probability and operation count.
-
-## What remains outside the formalisation
-
-The unformalised dependencies include the original filter-specific moment
-inequalities and their analytic certificates; finite-circle convergence and
-its application to the filters; the checksum tables and estimator with their
-probability and resource bounds; isolation probabilities; the deficiency,
-coverage and work analysis of the alias algorithm; and the capped word-RAM
-implementation with an every-random-outcome runtime guarantee.
-
-Consequently, this development strengthens the verification of the refinement
-but does not remove the conditional status of the full algorithmic claim.
-A successful build must not be described as verification of the complete paper
-or as a verified new best Subset Sum algorithm.
-
-## Reproduce
-
-The checked toolchain is `leanprover/lean4:v4.24.0`. The mathlib dependency is
-pinned to commit `f897ebcf72cd16f89ab4577d0c826cd14afaafc7` in `lakefile.toml`.
-From the repository root, with elan installed:
+The toolchain is `leanprover/lean4:v4.24.0`. Mathlib is pinned to `f897ebcf72cd16f89ab4577d0c826cd14afaafc7` in `lakefile.toml`.
 
 ```sh
 lake update
 lake exe cache get
 lake build
 lake env lean Audit.lean
-```
-
-`lake update` and the cache step need network access. The source proofs are
-then compiled by Lean. The independent numerical checker remains available:
-
-```sh
+lake env lean FiniteDataAudit.lean
 python3 verify.py
 ```
 
-The GitHub Actions workflow [Lean proof](.github/workflows/lean.yml) repeats
-these checks. Its logs identify the exact tested commit and contain both the
-build result and the output of `#print axioms` for the principal theorems.
+The successful finite-data run recorded the exact source revision and SHA-256 hashes in [verification/finite-data.json](verification/finite-data.json). Its full build and dependency logs are committed under `verification/`. The [earlier verification record](LEAN_VERIFICATION.md) is retained as a historical record of the initial seven-module development.
 
-## Trust boundary
+The finite-data dependency audit reports only `propext`, `Classical.choice` and `Quot.sound`. The workflow rejects unfinished proofs, custom axiom declarations and native proof-evaluation shortcuts. Standard Lean and mathlib foundations, the pinned toolchain and its compiled library cache remain part of the normal build environment. The absence of extra logical axioms does not eliminate explicit mathematical hypotheses in other modules.
 
-The project rejects `sorry`, `admit`, custom `axiom` declarations and
-`native_decide` in its Lean sources. `Audit.lean` reports logical dependencies
-for the principal results. Standard Lean foundations such as `propext`,
-`Classical.choice` and `Quot.sound` are distinguished from an unproved
-problem-specific premise. Explicit hypotheses on original integrals remain
-necessary even when the corresponding theorem has only standard logical
-axioms in its dependency report.
-
-The proof-producing tactics are checked by Lean's kernel. This repository
-does not claim to have rebuilt and independently audited all of mathlib or
-the Lean compiler. Downloaded mathlib cache files and the pinned toolchain
-are part of the normal build environment.
+The paper's conditional status is unchanged. A clean build of this development must not be described as a verified new best Subset Sum algorithm.

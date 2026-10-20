@@ -15,23 +15,38 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Install pinned Lean toolchain
         run: |
-          curl -sSf https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
+          curl --retry 3 -sSf https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o /tmp/elan-init.sh
           sh /tmp/elan-init.sh -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Fetch pinned mathlib and compiled cache
         run: |
           lake update
           lake exe cache get
-      - name: Reject proof gaps and trusted native shortcuts
+      - name: Reject proof gaps and native-evaluation shortcuts
         run: |
-          if grep -R -nE '\b(sorry|admit|axiom|native_decide)\b' --include='*.lean' SubsetSum SubsetSum.lean Audit.lean; then
+          if grep -R -nE '\b(sorry|admit|axiom|native_decide)\b|decide[[:space:]]*\+native' --include='*.lean' SubsetSum SubsetSum.lean Audit.lean FiniteDataAudit.lean; then
             echo 'Unproved declaration or native shortcut found.' >&2
             exit 1
           fi
-      - name: Kernel-check all proof files
+      - name: Kernel-check all proof files and both dependency audits
         run: |
-          set -o pipefail
+          set -euo pipefail
           lake build 2>&1 | tee lean-build.log
           lake env lean Audit.lean 2>&1 | tee lean-axioms.log
+          lake env lean FiniteDataAudit.lean 2>&1 | tee finite-data-axioms.log
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          allowed = {'propext', 'Classical.choice', 'Quot.sound'}
+          for name in ['lean-axioms.log', 'finite-data-axioms.log']:
+              text = Path(name).read_text()
+              for group in re.findall(r'depends on axioms:\s*\[([^\]]*)\]', text):
+                  found = {s.strip() for s in group.split(',') if s.strip()}
+                  if found - allowed:
+                      raise SystemExit('Unexpected proof dependencies: ' + str(found))
+              if 'sorryAx' in text:
+                  raise SystemExit('Unfinished proof in dependency audit')
+          assert 'SubsetSum.FilterData.complete_finite_certificate_data' in Path('finite-data-axioms.log').read_text()
+          PY
       - name: Recheck independent Python certificates
         run: python3 verify.py

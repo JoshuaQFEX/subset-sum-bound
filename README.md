@@ -3,53 +3,37 @@
 **Author:** Joshua Wharton, QFEX  
 **Email:** [joshua@qfex.com](mailto:joshua@qfex.com)
 
-A **conditional refinement to `O(2^(0.487676 n))`** of the claimed
-`O(2^(0.4877 n))` construction in `a-kapila/maths-proofs`.
+A **conditional refinement to `O(2^(0.487676 n))`** of the claimed `O(2^(0.4877 n))` construction in `a-kapila/maths-proofs`.
 
-**Status:** The repository contains a written conditional argument, exact
-rational Python checks, and a Lean 4 formalisation of specified components.
-The original algorithmic lemmas and moment inequalities remain dependencies;
-this is **not an end-to-end verified Subset Sum solver or a verified world
-record**. See [the formalisation scope](FORMALIZATION.md) before interpreting
-a successful Lean build.
+**Latest verified milestone:** all 43 filters, all 430 finite certificate records and their complete filter/region coverage now have compiled Lean proofs. The full project build, dependency audits, proof-gap scan and independent Python checks passed in [run 39487903482](https://github.com/JoshuaQFEX/subset-sum-bound/actions/runs/39487903482). See [the milestone and evidence](FINITE_DATA_MILESTONE.md).
 
-## Paper and Lean proofs
+**Overall status:** this is not an end-to-end verified Subset Sum solver or a verified world record. The original continuous moment inequalities and remaining algorithmic guarantees still require proofs. The written paper remains conditional.
 
-[Read the paper (PDF)](paper.pdf) | [LaTeX source](paper.tex) |
-[Lean source](SubsetSum.lean) | [Formalisation scope](FORMALIZATION.md)
+## Paper and proofs
 
-The paper contains the conditional theorem, exact parameters, alias
-constraints, certificate-transfer argument, error analysis and pinned
-references. The internal work exponent is `0.48767595`; the final exponent
-`0.487676` absorbs the stated subexponential and polynomial factors.
+[Paper (PDF)](paper.pdf) | [LaTeX source](paper.tex) | [Lean source](SubsetSum.lean) | [Current formalisation scope](FORMALIZATION.md) | [Finite-data theorem](SubsetSum/FilterData.lean)
 
-The Lean companion formalises the real-logarithm and entropy bounds, alias
-side conditions, certificate-transfer inequalities and integral identities,
-exact numerical margins, sublinear-exponent absorption, and deterministic
-subset-sum decision identities. Original moment bounds are explicit
-hypotheses where required. The companion does not change the full paper's
-conditional status.
+The paper contains the conditional theorem, exact parameters, alias constraints, certificate-transfer argument, error analysis and pinned references. The internal work exponent is `0.48767595`; the displayed exponent `0.487676` absorbs the stated subexponential and polynomial factors.
+
+The Lean development includes real-logarithm/entropy inequalities, transfer identities, exact numerical budgets, sublinear-exponent absorption, finite-subset decision identities, finite isolation and transformation proofs, supporting layer-counting arguments and the complete finite-data theorem. The integral-transfer results retain explicit original-moment hypotheses.
 
 ## Reproduce the Lean checks
 
-With elan installed:
+With elan installed, the committed sources can be checked directly:
 
 ```sh
 lake update
 lake exe cache get
 lake build
 lake env lean Audit.lean
+lake env lean FiniteDataAudit.lean
 ```
 
-The toolchain is Lean `4.24.0`; mathlib is pinned to commit
-`f897ebcf72cd16f89ab4577d0c826cd14afaafc7`. The
-[Lean workflow](.github/workflows/lean.yml) records build and axiom-audit
-results for the tested commit. The full theorem map and remaining
-unformalised dependencies are in [FORMALIZATION.md](FORMALIZATION.md).
+Lean is pinned to `4.24.0` and mathlib to `f897ebcf72cd16f89ab4577d0c826cd14afaafc7`. The generated finite-data sources are committed; they do not need to be regenerated for a normal build.
 
-## Reproduce the independent Python checks
+The [verification record](verification/finite-data.json) identifies the checked source revision and hashes every generated Lean file. [Build output](verification/finite-data-build.txt) and [finite-data dependencies](verification/finite-data-axioms.txt) are included. [LEAN_VERIFICATION.md](LEAN_VERIFICATION.md) records the earlier core milestone.
 
-Requires Python 3.7 or later; no third-party packages or network access.
+## Independent numerical checks
 
 ```sh
 python3 verify.py
@@ -57,53 +41,34 @@ python3 verify.py
 make verify
 ```
 
-The checked output is in [verification.txt](verification.txt).
-[parameters.json](parameters.json) contains exact decimal-rational inputs.
-[source_facts.json](source_facts.json) contains transcribed baseline data
-and explicitly assumed original moment margins.
+The checker uses standard-library exact rational intervals. [parameters.json](parameters.json) contains exact inputs; [source_facts.json](source_facts.json) contains transcribed baseline data and explicitly assumed moment margins. [verification.txt](verification.txt) retains the original checker output.
 
-An optional finite-data audit accepts a local copy of the baseline source:
+The optional command below checks finite-data transcriptions against a local baseline manuscript. It does not prove the original integrals or the complete algorithm:
 
 ```sh
 python3 verify.py --baseline /path/to/PROOF_0.4877.tex
 ```
 
-Use the exact pinned source linked below. This option checks the
-transcriptions and all 430 multiplier rows; it does **not** rerun their
-integrals, prove the underlying algorithm, or authenticate file provenance.
-The included Python verification run used the supplied transcriptions,
-not this optional audit. The Lean numerical proofs do not use the Python
-output as an oracle.
+To regenerate the Lean tables, use the exact pinned manuscript:
+
+```sh
+python3 tools/generate_filter_data.py /path/to/PROOF_0.4877.tex SubsetSum/FilterData.lean
+lake build
+lake env lean FiniteDataAudit.lean
+```
+
+The generator authenticates the original Git blob and emits exact rational constants. Lean, not Python, establishes the finite inequalities.
 
 ## Build the PDF
 
-Requires a standard LaTeX installation with pdfLaTeX and the packages
-listed in `paper.tex` (including Latin Modern, AMS, booktabs, microtype,
-xurl, hyperref and fancyvrb).
-
 ```sh
 make pdf
-# Or, run twice:
-pdflatex -interaction=nonstopmode -halt-on-error -no-shell-escape paper.tex
-pdflatex -interaction=nonstopmode -halt-on-error -no-shell-escape paper.tex
 ```
 
-The compiled [paper.pdf](paper.pdf) is included in the repository.
-Intermediate LaTeX files remain ignored. `make clean` removes local build
-outputs; run `make pdf` afterwards to regenerate the PDF. The Lean scope
-is documented separately rather than silently changing the earlier paper.
+This requires pdfLaTeX and the packages named in `paper.tex`. The compiled [paper.pdf](paper.pdf) is included. Intermediate LaTeX files remain ignored. The paper is unchanged by the finite-data milestone; [FORMALIZATION.md](FORMALIZATION.md) explains the companion proof's current scope.
 
-## Pinned dependencies
+## Pinned references and provenance
 
-- Baseline manuscript: [`subset-sum/PROOF_0.4877.tex`](https://github.com/a-kapila/maths-proofs/blob/44c34961b56784c220a6e913cc068d57dc37c5a3/subset-sum/PROOF_0.4877.tex),
-  commit `44c34961b56784c220a6e913cc068d57dc37c5a3`.
-- Foundational preprint: [OpenAI, *Subset Sum in Time O(2^(0.49n))*](https://github.com/openai/math/blob/fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb/preprints/Subset-Sum-in-Time-2-power-0-49n-October-4-2026/README.md),
-  dated 4 October 2026, repository commit `fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb`.
-- Intended specification: [Big O Speedrun Subset Sum benchmark](https://bigospeedrun.com/subset-sum).
+The baseline is [`subset-sum/PROOF_0.4877.tex`](https://github.com/a-kapila/maths-proofs/blob/44c34961b56784c220a6e913cc068d57dc37c5a3/subset-sum/PROOF_0.4877.tex), commit `44c34961b56784c220a6e913cc068d57dc37c5a3`. The foundational preprint is [OpenAI, *Subset Sum in Time O(2^(0.49n))*](https://github.com/openai/math/blob/fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb/preprints/Subset-Sum-in-Time-2-power-0-49n-October-4-2026/README.md), pinned at `fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb`. The intended specification is the [Big O Speedrun benchmark](https://bigospeedrun.com/subset-sum).
 
-## Provenance
-
-Prepared with ChatGPT on 20 October 2026. The written derivation, Python
-checker and Lean companion have distinct verification scopes, stated in
-the paper and formalisation guide. No licence is added by this repository;
-the baseline sources are linked, not redistributed.
+Prepared with ChatGPT, 20 October 2026. The numerical tables are transcribed from the pinned baseline and attributed in their generated source headers. The full baseline manuscript is linked rather than redistributed. No licence is added by this repository. The written derivation, Python checker and Lean development have distinct verification scopes.
