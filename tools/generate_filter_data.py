@@ -133,7 +133,7 @@ def main() -> None:
             lines += [
                 f'def {key} : RawCertificate := ⟨{v}, {r}, {cs}, {rats(zs)}⟩',
                 f'theorem {key}_valid : ValidCertificate {key} := by',
-                f'  norm_num [{key}, ValidCertificate, lowerBoundary, Fin.ext_iff] <;> decide',
+                f'  norm_num [{key}, ValidCertificate, lowerBoundary, Fin.ext_iff]',
                 f'theorem {key}_cap : FirstCap {key} := by',
                 f'  norm_num [{key}, FirstCap]', ''
             ]
