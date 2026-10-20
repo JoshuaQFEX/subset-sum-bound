@@ -13,3 +13,6 @@ __pycache__/
 
 # Publish the compiled paper alongside its source.
 !paper.pdf
+
+# Local Lean build products and downloaded dependencies
+.lake/

@@ -6,22 +6,48 @@
 A **conditional refinement to `O(2^(0.487676 n))`** of the claimed
 `O(2^(0.4877 n))` construction in `a-kapila/maths-proofs`.
 
-**Status:** The new scalar inequalities pass exact rational checks. The
-underlying algorithmic lemmas and the original 430 moment inequalities
-remain inherited assumptions. This is not a formal proof-assistant
-verification, an independently verified world record, or a practical
-speedup claim.
+**Status:** The repository contains a written conditional argument, exact
+rational Python checks, and a Lean 4 formalisation of specified components.
+The original algorithmic lemmas and moment inequalities remain dependencies;
+this is **not an end-to-end verified Subset Sum solver or a verified world
+record**. See [the formalisation scope](FORMALIZATION.md) before interpreting
+a successful Lean build.
 
-## Paper
+## Paper and Lean proofs
 
-[Read the paper (PDF)](paper.pdf) | [LaTeX source](paper.tex).
-Rebuild the PDF locally with `make pdf`.
-The paper includes the conditional theorem, exact parameters, alias
-constraints, the certificate-transfer lemma, the error analysis and
-pinned references. The internal work exponent is `0.48767595`; the final
-`0.487676` exponent absorbs the stated subexponential and polynomial factors.
+[Read the paper (PDF)](paper.pdf) | [LaTeX source](paper.tex) |
+[Lean source](SubsetSum.lean) | [Formalisation scope](FORMALIZATION.md)
 
-## Reproduce the checks
+The paper contains the conditional theorem, exact parameters, alias
+constraints, certificate-transfer argument, error analysis and pinned
+references. The internal work exponent is `0.48767595`; the final exponent
+`0.487676` absorbs the stated subexponential and polynomial factors.
+
+The Lean companion formalises the real-logarithm and entropy bounds, alias
+side conditions, certificate-transfer inequalities and integral identities,
+exact numerical margins, sublinear-exponent absorption, and deterministic
+subset-sum decision identities. Original moment bounds are explicit
+hypotheses where required. The companion does not change the full paper's
+conditional status.
+
+## Reproduce the Lean checks
+
+With elan installed:
+
+```sh
+lake update
+lake exe cache get
+lake build
+lake env lean Audit.lean
+```
+
+The toolchain is Lean `4.24.0`; mathlib is pinned to commit
+`f897ebcf72cd16f89ab4577d0c826cd14afaafc7`. The
+[Lean workflow](.github/workflows/lean.yml) records build and axiom-audit
+results for the tested commit. The full theorem map and remaining
+unformalised dependencies are in [FORMALIZATION.md](FORMALIZATION.md).
+
+## Reproduce the independent Python checks
 
 Requires Python 3.7 or later; no third-party packages or network access.
 
@@ -45,8 +71,9 @@ python3 verify.py --baseline /path/to/PROOF_0.4877.tex
 Use the exact pinned source linked below. This option checks the
 transcriptions and all 430 multiplier rows; it does **not** rerun their
 integrals, prove the underlying algorithm, or authenticate file provenance.
-The included verification run used the supplied transcriptions, not this
-optional audit.
+The included Python verification run used the supplied transcriptions,
+not this optional audit. The Lean numerical proofs do not use the Python
+output as an oracle.
 
 ## Build the PDF
 
@@ -61,9 +88,10 @@ pdflatex -interaction=nonstopmode -halt-on-error -no-shell-escape paper.tex
 pdflatex -interaction=nonstopmode -halt-on-error -no-shell-escape paper.tex
 ```
 
-The compiled [paper.pdf](paper.pdf) is included in the repository. Intermediate
-LaTeX files remain ignored by Git. `make clean` removes local build outputs;
-run `make pdf` afterwards to regenerate the PDF.
+The compiled [paper.pdf](paper.pdf) is included in the repository.
+Intermediate LaTeX files remain ignored. `make clean` removes local build
+outputs; run `make pdf` afterwards to regenerate the PDF. The Lean scope
+is documented separately rather than silently changing the earlier paper.
 
 ## Pinned dependencies
 
@@ -75,7 +103,7 @@ run `make pdf` afterwards to regenerate the PDF.
 
 ## Provenance
 
-Prepared with ChatGPT on 20 October 2026. The written derivation and the
-scalar checker have different verification scopes, stated in the paper.
-No licence is added by this repository; the baseline sources are linked,
-not redistributed.
+Prepared with ChatGPT on 20 October 2026. The written derivation, Python
+checker and Lean companion have distinct verification scopes, stated in
+the paper and formalisation guide. No licence is added by this repository;
+the baseline sources are linked, not redistributed.
