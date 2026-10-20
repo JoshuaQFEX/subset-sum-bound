@@ -110,7 +110,7 @@ def main() -> None:
             cs = '[' + ', '.join(str(j) for j in comps) + ']'
             lines += [f'def {key} : RawCertificate := ⟨{v}, {r}, {cs}, {rats(zs)}⟩',
                       f'private theorem {key}_valid : ValidCertificate {key} := by',
-                      f'  norm_num [{key}, ValidCertificate, lowerBoundary]',
+                      f'  norm_num [{key}, ValidCertificate, lowerBoundary, Fin.ext_iff] <;> decide',
                       f'private theorem {key}_cap : FirstCap {key} := by',
                       f'  norm_num [{key}, FirstCap]', '']
     filter_names = [f'filter_{v}' for v in range(43)]
