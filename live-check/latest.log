@@ -22,11 +22,10 @@ Hint: Omit it from the simp argument list.
   simp ̵[̵N̵a̵t̵.̵m̵u̵l̵_̵c̵o̵m̵m̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [7363/7365] Built SubsetSum.Sampling (6.8s)
+⚠ [7363/7365] Replayed SubsetSum.Sampling
 warning: SubsetSum/Sampling.lean:100:19: unused variable `hav`
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-✔ [7364/7365] Built SubsetSum (3.4s)
 Build completed successfully (7365 jobs).
 
 $ lake env lean Scratch.lean
