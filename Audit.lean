@@ -32,3 +32,6 @@ import SubsetSum
 #print axioms SubsetSum.AnalyticFilters.score_component_bounds
 #print axioms SubsetSum.AnalyticFilters.concrete_score_bound
 #print axioms SubsetSum.AnalyticFilters.concrete_normalizers_positive
+
+#print axioms SubsetSum.AnalyticFilters.complex_cos_norm_le_hyperbolic
+#print axioms SubsetSum.AnalyticFilters.hyperbolic_envelope_eq_exp
