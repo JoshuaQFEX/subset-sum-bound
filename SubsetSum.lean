@@ -16,3 +16,4 @@ import SubsetSum.FilterData
 import SubsetSum.AnalyticFilterBounds
 import SubsetSum.FilterFunctions
 import SubsetSum.FilterScoreBounds
+import SubsetSum.ComplexStripBounds
