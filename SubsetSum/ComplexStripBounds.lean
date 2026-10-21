@@ -39,27 +39,10 @@ theorem complex_cos_norm_le_hyperbolic (z : ℂ) :
         mul_le_mul_of_nonneg_right hcos (Real.cosh_pos z.im).le,
         mul_le_mul_of_nonneg_right hsin (abs_nonneg (Real.sinh z.im))]
 
-/-- The hyperbolic envelope itself has a simple exact exponential upper
-    bound. This intentionally uses a factor two to keep the proof elementary. -/
-theorem hyperbolic_envelope_le_exp (y : ℝ) :
-    Real.cosh y + |Real.sinh y| ≤ 2 * Real.exp |y| := by
-  have hy : 0 ≤ Real.exp |y| := (Real.exp_pos _).le
-  have hcosh : Real.cosh y ≤ Real.exp |y| := by
-    rw [← Real.cosh_abs]
-    have h := Real.cosh_le_exp_half_sq |y|
-    have harg : |y| ^ 2 / 2 ≤ |y| + |y| ^ 2 := by positivity
-    have hrough : Real.exp (|y| ^ 2 / 2) ≤ Real.exp (|y| + |y| ^ 2) :=
-      Real.exp_le_exp.mpr harg
-    exact (h.trans hrough).trans (by
-      have hnonneg : 0 ≤ |y| := abs_nonneg y
-      have hsq : 0 ≤ |y| ^ 2 := sq_nonneg _
-      nlinarith [Real.exp_pos |y|])
-  have hsinh : |Real.sinh y| ≤ Real.exp |y| := by
-    rw [Real.abs_sinh]
-    have h := Real.cosh_add_sinh |y|
-    have hnonneg : 0 ≤ Real.cosh |y| := (Real.cosh_pos _).le
-    nlinarith [Real.sinh_nonneg_iff.mpr (abs_nonneg y), Real.exp_pos |y|]
-  nlinarith
+/-- The hyperbolic envelope equals an exponential exactly. -/
+theorem hyperbolic_envelope_eq_exp (y : ℝ) :
+    Real.cosh y + |Real.sinh y| = Real.exp |y| := by
+  rw [Real.cosh_abs, Real.abs_sinh, Real.cosh_add_sinh]
 
 end
 end SubsetSum.AnalyticFilters
