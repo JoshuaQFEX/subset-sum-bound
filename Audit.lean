@@ -18,3 +18,7 @@ import SubsetSum
 #print axioms SubsetSum.regional_moment_transfer
 #print axioms SubsetSum.low_moment_refinement
 #print axioms SubsetSum.bounded_moment_identity
+
+#print axioms SubsetSum.AnalyticFilterBounds.cosinePolynomial_abs_le_coeff_sum
+#print axioms SubsetSum.AnalyticFilterBounds.cosinePolynomial_abs_le
+#print axioms SubsetSum.AnalyticFilterBounds.concrete_filter_real_axis_envelope
