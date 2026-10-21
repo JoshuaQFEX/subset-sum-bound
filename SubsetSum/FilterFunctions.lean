@@ -23,7 +23,7 @@ def cosineSeries : List ℚ → ℕ → ℝ → ℝ
 lemma continuous_cosineSeries (as : List ℚ) (k : ℕ) :
     Continuous (cosineSeries as k) := by
   induction as generalizing k with
-  | nil => simp [cosineSeries]
+  | nil => exact continuous_const
   | cons a as ih =>
     change Continuous (fun x : ℝ => (a : ℝ) * Real.cos ((k : ℝ) * x) +
       cosineSeries as (k + 1) x)
@@ -60,9 +60,13 @@ theorem concrete_filter_bounds (f : RawFilter) (hf : f ∈ filters) :
   obtain ⟨hrlen, hslen, hk1, hk2, hr, hs⟩ := all_filters_valid f hf
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro x
-    simpa [r, hrlen] using cosineSeries_bound f.rCoeffs hr 1 x
+    have hb := cosineSeries_bound f.rCoeffs hr 1 x
+    norm_num [r, hrlen] at hb ⊢
+    exact hb
   · intro x
-    simpa [s, hslen] using cosineSeries_bound f.sCoeffs hs 1 x
+    have hb := cosineSeries_bound f.sCoeffs hs 1 x
+    norm_num [s, hslen] at hb ⊢
+    exact hb
   · exact_mod_cast hk1
   · exact_mod_cast hk2
 
