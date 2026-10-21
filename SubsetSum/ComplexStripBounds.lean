@@ -42,7 +42,7 @@ theorem complex_cos_norm_le_hyperbolic (z : ℂ) :
 /-- The hyperbolic envelope equals an exponential exactly. -/
 theorem hyperbolic_envelope_eq_exp (y : ℝ) :
     Real.cosh y + |Real.sinh y| = Real.exp |y| := by
-  rw [Real.cosh_abs, Real.abs_sinh, Real.cosh_eq, Real.sinh_eq]
+  rw [← Real.cosh_abs, Real.abs_sinh, Real.cosh_eq, Real.sinh_eq]
   ring
 
 end
