@@ -91,7 +91,7 @@ theorem score_component_bounds (p q : ℝ → ℝ) (hp : Continuous p) (hq : Con
     calc
       |log2 (convolutionMass p q x) - normalizerLog p q| ≤
           |log2 (convolutionMass p q x)| + |normalizerLog p q| :=
-        abs_sub_le _ (0 : ℝ) _
+        by simpa [sub_zero, zero_sub, abs_neg] using (abs_sub_le _ (0 : ℝ) _)
       _ ≤ 32 + 32 := add_le_add hPL hZ
       _ = 64 := by norm_num
   · unfold scoreB
