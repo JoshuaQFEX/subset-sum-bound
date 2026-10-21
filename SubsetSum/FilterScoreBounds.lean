@@ -88,20 +88,25 @@ theorem score_component_bounds (p q : ℝ → ℝ) (hp : Continuous p) (hq : Con
   have hqk := powered_log_bound q hq hqb k hk
   refine ⟨hP, ?_, ?_, ?_⟩
   · unfold scoreL
-    have ht := abs_sub_le (log2 (convolutionMass p q x)) (normalizerLog p q)
-    change |log2 (convolutionMass p q x)| ≤ 32 at hPL
-    linarith
+    calc
+      |log2 (convolutionMass p q x) - normalizerLog p q| ≤
+          |log2 (convolutionMass p q x)| + |normalizerLog p q| :=
+        abs_sub_le _ 0 _
+      _ ≤ 32 + 32 := add_le_add hPL hZ
+      _ = 64 := by norm_num
   · unfold scoreB
-    have ht := abs_sub_le (convolutionWeighted p q x / convolutionMass p q x)
-      (normalizerLog p q)
-    change |convolutionWeighted p q x / convolutionMass p q x| ≤ 32 at hPB
-    linarith
+    calc
+      |convolutionWeighted p q x / convolutionMass p q x - normalizerLog p q| ≤
+          |convolutionWeighted p q x / convolutionMass p q x| + |normalizerLog p q| :=
+        abs_sub_le _ 0 _
+      _ ≤ 32 + 32 := add_le_add hPB hZ
+      _ = 64 := by norm_num
   · unfold scoreH
     calc
-      |log2 (poweredNormalizer p k) + log2 (poweredNormalizer q k) -
+      |(log2 (poweredNormalizer p k) + log2 (poweredNormalizer q k)) -
           k * normalizerLog p q| ≤
           |log2 (poweredNormalizer p k) + log2 (poweredNormalizer q k)| +
-            |k * normalizerLog p q| := abs_sub_le _ _
+            |k * normalizerLog p q| := abs_sub_le _ 0 _
       _ ≤ (|log2 (poweredNormalizer p k)| + |log2 (poweredNormalizer q k)|) +
             |k * normalizerLog p q| :=
         add_le_add_right (abs_add_le _ _) _
