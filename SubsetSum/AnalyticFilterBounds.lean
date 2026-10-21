@@ -11,8 +11,9 @@ set_option autoImplicit false
 
 namespace SubsetSum.AnalyticFilterBounds
 
-/-- A finite cosine polynomial with frequencies 1 through m. -/
-def cosinePolynomial (a : ℕ → ℝ) (m : ℕ) (x : ℝ) : ℝ :=
+/-- A finite cosine polynomial with frequencies 1 through m. This is a
+    mathematical real-valued function, not an executable approximation. -/
+noncomputable def cosinePolynomial (a : ℕ → ℝ) (m : ℕ) (x : ℝ) : ℝ :=
   ∑ j ∈ Finset.range m, a j * Real.cos ((j + 1 : ℕ) * x)
 
 /-- On the real axis, the absolute value is bounded by the coefficient
@@ -48,10 +49,9 @@ theorem cosinePolynomial_abs_le
       exact ha j hj
     _ = m * C := by simp
 
-/-- The coefficient bounds recorded for the concrete filters imply the
-    simple real-axis envelope 16 for either eight-term cosine polynomial.
-    The trigonometric polynomials are defined directly from the exact
-    rational coefficients in the checked finite table. -/
+/-- Specialisation to any eight-term coefficient sequence with cap 2.
+    This lemma retains the coefficient bound as an explicit hypothesis;
+    it does not itself extract coefficients from the concrete filter table. -/
 theorem concrete_filter_real_axis_envelope
     (a : ℕ → ℝ) (x : ℝ)
     (ha : ∀ j ∈ Finset.range 8, |a j| ≤ 2) :
