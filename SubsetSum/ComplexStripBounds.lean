@@ -129,5 +129,32 @@ theorem complexCosineSeries_norm_bound (as : List ℚ)
           push_cast
           ring
 
+
+/-- On real inputs, the complexified polynomial agrees with the real filter. -/
+theorem complexCosineSeries_ofReal (as : List ℚ) (k : ℕ) (x : ℝ) :
+    complexCosineSeries as k (x : ℂ) = (cosineSeries as k x : ℂ) := by
+  induction as generalizing k with
+  | nil => simp [complexCosineSeries, cosineSeries]
+  | cons a as ih =>
+      simp [complexCosineSeries, cosineSeries, Complex.ofReal_cos, ih]
+
+/-- The actual checked filter tables inherit a uniform complex-strip envelope.
+    This is a theorem about the concrete 43-filter data, not a hypothesis
+    about arbitrary coefficients. -/
+theorem concrete_complex_filter_strip_envelope
+    (f : SubsetSum.FilterData.RawFilter)
+    (hf : f ∈ SubsetSum.FilterData.filters) (z : ℂ) :
+    ‖complexCosineSeries f.rCoeffs 1 z‖ ≤ 16 * Real.exp (9 * |z.im|) ∧
+    ‖complexCosineSeries f.sCoeffs 1 z‖ ≤ 16 * Real.exp (9 * |z.im|) := by
+  obtain ⟨hrlen, hslen, hk1, hk2, hr, hs⟩ :=
+    SubsetSum.FilterData.all_filters_valid f hf
+  constructor
+  · have hb := complexCosineSeries_norm_bound f.rCoeffs hr 1 z
+    norm_num [hrlen] at hb ⊢
+    exact hb
+  · have hb := complexCosineSeries_norm_bound f.sCoeffs hs 1 z
+    norm_num [hslen] at hb ⊢
+    exact hb
+
 end
 end SubsetSum.AnalyticFilters
