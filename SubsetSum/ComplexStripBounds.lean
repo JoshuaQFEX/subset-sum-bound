@@ -27,8 +27,9 @@ theorem complex_cos_norm_le_hyperbolic (z : ℂ) :
       norm_sub_le _ _
     _ = |Real.cos z.re| * |Real.cosh z.im| +
         |Real.sin z.re| * |Real.sinh z.im| := by
-      simp [Complex.ofReal_cos, Complex.ofReal_sin, Complex.ofReal_cosh,
-        Complex.ofReal_sinh, norm_mul]
+      rw [← Complex.ofReal_cos, ← Complex.ofReal_cosh,
+        ← Complex.ofReal_sin, ← Complex.ofReal_sinh]
+      simp [norm_mul, Complex.norm_I]
     _ ≤ Real.cosh z.im + |Real.sinh z.im| := by
       have hc : |Real.cosh z.im| = Real.cosh z.im :=
         abs_of_pos (Real.cosh_pos _)
