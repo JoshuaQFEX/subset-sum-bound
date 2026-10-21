@@ -29,7 +29,7 @@ theorem complex_cos_norm_le_hyperbolic (z : ℂ) :
         |Real.sin z.re| * |Real.sinh z.im| := by
       rw [← Complex.ofReal_cos, ← Complex.ofReal_cosh,
         ← Complex.ofReal_sin, ← Complex.ofReal_sinh]
-      simp only [norm_mul, norm_ofReal, norm_I]
+      simp only [norm_mul, norm_ofReal, Real.norm_eq_abs, norm_I]
     _ ≤ Real.cosh z.im + |Real.sinh z.im| := by
       have hc : |Real.cosh z.im| = Real.cosh z.im :=
         abs_of_pos (Real.cosh_pos _)
