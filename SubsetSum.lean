@@ -13,3 +13,4 @@ import SubsetSum.Layers
 import SubsetSum.Sampling
 import SubsetSum.SmallLayer
 import SubsetSum.FilterData
+import SubsetSum.AnalyticFilterBounds
