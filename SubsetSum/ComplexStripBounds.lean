@@ -70,7 +70,7 @@ theorem complex_cos_nat_mul_norm_le_exp (n : ℕ) (z : ℂ) :
 def complexCosineSeries : List ℚ → ℕ → ℂ → ℂ
   | [], _, _ => 0
   | a :: as, k, z =>
-      (a : ℂ) * Complex.cos ((k : ℂ) * z) +
+      ((a : ℝ) : ℂ) * Complex.cos ((k : ℂ) * z) +
         complexCosineSeries as (k + 1) z
 
 /-- Strip envelope for a finite cosine series. It follows directly from the
@@ -93,7 +93,7 @@ theorem complexCosineSeries_norm_bound (as : List ℚ)
           ((k + (as.length + 1) : ℕ) : ℝ) * |z.im| := by
         exact mul_le_mul_of_nonneg_right (by exact_mod_cast hfreqNat) hσ
       have hexp := Real.exp_le_exp.mpr hfreq
-      have hterm : ‖(a : ℂ) * Complex.cos ((k : ℂ) * z)‖ ≤
+      have hterm : ‖((a : ℝ) : ℂ) * Complex.cos ((k : ℂ) * z)‖ ≤
           2 * Real.exp ((k : ℝ) * |z.im|) := by
         rw [norm_mul, Complex.norm_ofReal]
         calc
@@ -110,7 +110,7 @@ theorem complexCosineSeries_norm_bound (as : List ℚ)
       rw [hfreqEq] at ht
       calc
         ‖complexCosineSeries (a :: as) k z‖ ≤
-            ‖(a : ℂ) * Complex.cos ((k : ℂ) * z)‖ +
+            ‖((a : ℝ) : ℂ) * Complex.cos ((k : ℂ) * z)‖ +
               ‖complexCosineSeries as (k + 1) z‖ := norm_add_le _ _
         _ ≤ 2 * Real.exp ((k : ℝ) * |z.im|) +
               2 * (as.length : ℝ) *
