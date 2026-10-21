@@ -87,7 +87,7 @@ theorem complexCosineSeries_norm_bound (as : List ℚ)
       simp [complexCosineSeries]
   | cons a as ih =>
       have ha' : |(a : ℝ)| ≤ 2 := by exact_mod_cast ha a (by simp)
-      have ht := ih (fun b hb => ha b (List.mem_cons_of_mem a hb)) (k + 1) z
+      have ht := ih (fun b hb => ha b (List.mem_cons_of_mem a hb)) (k + 1)
       have hσ : 0 ≤ |z.im| := abs_nonneg _
       have hfreqNat : k ≤ k + (as.length + 1) := by omega
       have hfreq : (k : ℝ) * |z.im| ≤
