@@ -29,7 +29,7 @@ theorem complex_cos_norm_le_hyperbolic (z : ℂ) :
         |Real.sin z.re| * |Real.sinh z.im| := by
       rw [← Complex.ofReal_cos, ← Complex.ofReal_cosh,
         ← Complex.ofReal_sin, ← Complex.ofReal_sinh]
-      simp [norm_mul, Complex.norm_I]
+      simp only [norm_mul, norm_ofReal, norm_I]
     _ ≤ Real.cosh z.im + |Real.sinh z.im| := by
       have hc : |Real.cosh z.im| = Real.cosh z.im :=
         abs_of_pos (Real.cosh_pos _)
@@ -96,7 +96,7 @@ theorem complexCosineSeries_norm_bound (as : List ℚ)
       have hexp := Real.exp_le_exp.mpr hfreq
       have hterm : ‖((a : ℝ) : ℂ) * Complex.cos ((k : ℂ) * z)‖ ≤
           2 * Real.exp ((k : ℝ) * |z.im|) := by
-        rw [norm_mul, Complex.norm_ofReal]
+        rw [norm_mul, norm_ofReal]
         calc
           |(a : ℝ)| * ‖Complex.cos ((k : ℂ) * z)‖ ≤
               2 * ‖Complex.cos ((k : ℂ) * z)‖ :=
