@@ -91,14 +91,14 @@ theorem score_component_bounds (p q : ℝ → ℝ) (hp : Continuous p) (hq : Con
     calc
       |log2 (convolutionMass p q x) - normalizerLog p q| ≤
           |log2 (convolutionMass p q x)| + |normalizerLog p q| :=
-        abs_sub_le _ 0 _
+        abs_sub_le _ (0 : ℝ) _
       _ ≤ 32 + 32 := add_le_add hPL hZ
       _ = 64 := by norm_num
   · unfold scoreB
     calc
       |convolutionWeighted p q x / convolutionMass p q x - normalizerLog p q| ≤
           |convolutionWeighted p q x / convolutionMass p q x| + |normalizerLog p q| :=
-        abs_sub_le _ 0 _
+        abs_sub_le _ (0 : ℝ) _
       _ ≤ 32 + 32 := add_le_add hPB hZ
       _ = 64 := by norm_num
   · unfold scoreH
@@ -106,7 +106,7 @@ theorem score_component_bounds (p q : ℝ → ℝ) (hp : Continuous p) (hq : Con
       |(log2 (poweredNormalizer p k) + log2 (poweredNormalizer q k)) -
           k * normalizerLog p q| ≤
           |log2 (poweredNormalizer p k) + log2 (poweredNormalizer q k)| +
-            |k * normalizerLog p q| := abs_sub_le _ 0 _
+            |k * normalizerLog p q| := abs_sub_le _ (0 : ℝ) _
       _ ≤ (|log2 (poweredNormalizer p k)| + |log2 (poweredNormalizer q k)|) +
             |k * normalizerLog p q| :=
         add_le_add_right (abs_add_le _ _) _
